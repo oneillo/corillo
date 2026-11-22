@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en" class="on-paper">
+<head>
+<meta charset="utf-8">
+<!--
+  The page's rule. Nothing framed, no plugins. It connects only to files: it
+  reads each prepared picture's dots per inch with a fetch, and a rule can't
+  name single files, so the page's session (exportPageSession in
+  src/main/export.ts) lets it load only the pictures the pictures step
+  prepared and its own files. A picture on the web or elsewhere on the Mac
+  (one a diagram links to) is asked for, named in the notice and given a blank.
+  The build names the page's scripts by their hashes in place of 'self'.
+-->
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src file:; frame-src 'none'; object-src 'none'; img-src 'self' file: https: data: blob:; style-src 'self' 'unsafe-inline'; script-src 'self'; font-src 'self' data:">
+<title>Corillo</title>
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="export.css">
+</head>
+<body>
+<article id="page" class="page"></article>
+<script src="export-page.js"></script>
+</body>
+</html>

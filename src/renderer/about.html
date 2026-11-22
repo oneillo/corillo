@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src 'none'; frame-src 'none'; object-src 'none'; img-src 'self'; style-src 'self'; script-src 'self'">
+<title>About Corillo</title>
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="about.css">
+</head>
+<body class="about">
+<main class="about-main">
+  <header class="about-head">
+    <img class="about-icon" src="corillo-icon.svg" alt="" width="112" height="112">
+    <h1>Corillo</h1>
+    <p id="about-version" class="about-version"></p>
+    <p id="about-build" class="about-build" hidden></p>
+    <p class="about-line">A Markdown editor for writing documents together with AI agents.</p>
+  </header>
+
+  <section class="about-section" aria-labelledby="licence-title">
+    <h2 id="licence-title">Licence</h2>
+    <p>Corillo is free and open source software, under the MIT licence.</p>
+    <details id="licence">
+      <summary>Read the licence</summary>
+      <pre id="licence-text" class="about-text"></pre>
+    </details>
+  </section>
+
+  <section class="about-section" aria-labelledby="third-party-title">
+    <h2 id="third-party-title">Third-party software</h2>
+    <p>Corillo is built with open source software made by other people. Each part comes with its own licence.</p>
+    <ul class="about-parts">
+      <li id="packages">
+        <div class="about-part">
+          <span class="about-part-name">Open source packages</span>
+          <span id="package-count" class="about-part-note"></span>
+        </div>
+        <details id="notices">
+          <summary>Show the list and licences</summary>
+          <pre id="notices-text" class="about-text"></pre>
+        </details>
+      </li>
+      <li id="chromium" hidden>
+        <div class="about-part">
+          <span class="about-part-name">Electron and Chromium</span>
+          <span class="about-part-note">The engine that runs Corillo's window.</span>
+        </div>
+        <button id="open-chromium" type="button" class="link-button">Show their notices</button>
+      </li>
+      <li id="pandoc" hidden>
+        <div class="about-part">
+          <span id="pandoc-name" class="about-part-name">Pandoc</span>
+          <span class="about-part-note">Makes Word documents. It's free software under the GNU General Public License, included as a separate program.</span>
+        </div>
+        <details id="pandoc-licence">
+          <summary>Read its licence</summary>
+          <pre id="pandoc-text" class="about-text"></pre>
+        </details>
+        <button id="pandoc-source" type="button" class="link-button">Get its source code</button>
+      </li>
+    </ul>
+  </section>
+</main>
+<script src="about.js"></script>
+</body>
+</html>

@@ -1,0 +1,2585 @@
+/* Corillo, Adoquín palette (Old San Juan): cobblestone blue-grey for controls
+   and accents, flamboyán coral for comments, pastel façades for agents.
+   Follows the Mac's light or dark appearance.
+
+   The rules every part follows:
+   - Colours come only from the tokens below, solid, never gradients.
+   - Spacing is on a 4-pixel scale: 4, 8, 12, 16, 24, 32, 48, 64 (--space-*).
+   - Interface text is 11, 12, 13 or 15 pixels, each with one line height
+     (--text-*, --line-*; About's title 24, the start screen's name 28, and
+     the toolbar's B, I and S drawn as icons are sizes of their own), in the
+     Mac's own font, sentence case, never all capitals. Button words are one
+     weight (500).
+   - Every bar (tabs, toolbar, find, banners, status) keeps its boxes 16
+     pixels in from the window's edge, and starts its words and icons 24 in
+     (--edge, --bar-inset); the side panels start their heading level with
+     the top of the page.
+   - Buttons are 28 pixels tall (24 inside a comment card and the status bar,
+     32 in the toolbar: --control, --control-small, --control-large),
+     with 6-pixel corners. Cards and menus have 8, dialogs 12.
+   - The whole editing area is one solid surface: the page doesn't float on a
+     background (Orlando). Only things that float (menus, dialogs, notices)
+     cast a shadow. */
+
+/* The page's font: Literata, made for long reading on screens, bundled with
+   its licence (SIL Open Font License, approved by Orlando). One file per style
+   holds every weight and optical size. */
+@font-face {
+  font-family: "Literata";
+  src: url("fonts/Literata.ttf") format("truetype");
+  font-weight: 200 900;
+  font-style: normal;
+  font-display: block;
+}
+@font-face {
+  font-family: "Literata";
+  src: url("fonts/Literata-Italic.ttf") format("truetype");
+  font-weight: 200 900;
+  font-style: italic;
+  font-display: block;
+}
+
+:root {
+  color-scheme: light dark;
+  /* Surfaces, darkest to lightest */
+  --chrome: #E3E7E6;        /* tab bar, status bar */
+  --ground: #EAEDEC;        /* the window around the page */
+  --panel: #F3F5F4;         /* toolbar, find bar, side panels */
+  --page: #FFFFFF;          /* the page, cards, fields */
+  --side: #F3F5F4;          /* the side panels, the outline, the start screen */
+  --button: #FFFFFF;        /* a button's fill */
+  --float: #FFFFFF;         /* what floats: menus, the @ list, dialogs */
+  --chip: #EAEDEC;          /* a small label: "Whole document", History's sections */
+  --raw: #F3F5F4;           /* code, Markdown text */
+  --hover: #E6EBEA;         /* under the pointer */
+  --pressed: #DAE0DF;       /* while pressed */
+  --chrome-line: #D2D8D7;   /* between areas, round what floats */
+  --float-edge: #D2D8D7;    /* round the toolbar's menus: in light, the line round what floats */
+  /* Round what you click: buttons, fields, the start screen's cards. A calm grey edge:
+     3 to 1 or more on every surface a control sits on, under the pointer too (roadmap Batch 12, G-4). */
+  --control-line: #758484;
+  --card-line: #D2D8D7;     /* round a comment card: quiet, so the card in focus stands out */
+  --divider: #E3E7E6;       /* inside a surface */
+  --float-hover: #DCE6EA;   /* an item under the pointer in a menu or the @ list */
+  --hover-line: #C3D3DA;    /* round a card under the pointer */
+  /* Text */
+  --ink: #1F2427;
+  --ink-soft: #55606A;
+  --muted: #A9B2B8;         /* only for what can't be used right now */
+  --line-number: #6C777F;   /* lighter than ink-soft, still readable small */
+  /* Cobblestone blue-grey */
+  --accent: #4F6D7A;
+  --accent-strong: #435E6A;
+  --accent-ink: #36505B;
+  /* Headings and links inside the comment in focus: the blue-grey ink in light; in dark, the ink (roadmap Batch 12, G-12). */
+  --focused-comment-ink: #36505B;
+  --accent-tint: #DCE6EA;
+  --accent-line: #C3D3DA;
+  --on-accent: #FFFFFF;
+  /* The comment card in focus: a blue-grey wash, between the page and the accent tint */
+  --card-focus: #EBF1F4;
+  /* Flamboyán coral: comments */
+  --coral-tint: #F6DDD3;
+  --coral-line: #CC7354;    /* 3 to 1 on the page, the panels and the card in focus (Batch 12, G-14) */
+  --comment-mark: #F8E2D9;
+  --comment-mark-active: #EFCBBE;
+  /* What an agent changed for a comment: a clear sky, apart from comments' coral */
+  --change-mark: #DCE8F4;
+  --change-mark-line: #5A87B3; /* 3 to 1 on the page, the panels and in the change box (Batch 12, G-14) */
+  --change-box-line: #DCE8F4; /* round the "Claude changed" box on a card: the box's own colour in light, so none shows */
+  /* Needs the person's attention */
+  --warn-tint: #F8E7E0;
+  --warn-line: #EBC9BC;
+  --warning-ink: #8A3F2A;
+  /* What changed, and what Find found (a muted façade yellow, never coral) */
+  --diff-added: #DCEBDD;
+  --diff-added-line: #779E7D; /* 3 to 1 on the page (Batch 12, G-14) */
+  --diff-removed: #8F4A3B;
+  --diff-removed-tint: #F4E4DF;
+  --find-tint: #F4E7B8;
+  --find-current: #E6C66A;
+  --read-mark: #E7EDF0;     /* Read Aloud: the sentence being read, behind its words (soft words on it 4.5 to 1 and more) */
+  --read-word: #D0DDE2;     /* and the word being said */
+  /* Façade pastels, one per agent (chosen by agentColours in src/core/agents.ts);
+     each is a background for the agent's initial in --agent-ink. */
+  --agent-ink: #3B3F42;
+  --agent-peach: #EFC9A9;
+  --agent-sky: #B9CEE2;
+  --agent-mint: #B4D7C7;
+  --agent-lilac: #CEC1DF;
+  --agent-ochre: #E8D49C;
+  --agent-rose: #E9C0C0;
+  /* Each pastel's edge, where a dot in it sits on the bars or a card: a deeper tone of the same
+     colour, 4.5 to 1 or more against the tab bar (roadmap Batch 11, F-5). */
+  --agent-peach-edge: #855E3C;
+  --agent-sky-edge: #54697E;
+  --agent-mint-edge: #4A6F5F;
+  --agent-lilac-edge: #6E617F;
+  --agent-ochre-edge: #7A6523;
+  --agent-rose-edge: #865D5E;
+  /* Obsidian's callouts: a soft box, edged in the matching façade pastel
+     above; and its ==highlights==, a highlighter yellow. */
+  --callout-sky: #E6EEF4;
+  --callout-mint: #E3F0EA;
+  --callout-ochre: #F6EFDA;
+  --callout-rose: #F6E6E6;
+  --callout-lilac: #EEEAF4;
+  --highlight-mark: #F8EC9E;
+  /* Depth, for what floats */
+  --menu-shadow: 0 8px 24px rgba(31, 36, 39, 0.14);
+  --lift-shadow: 0 0 8px rgba(31, 36, 39, 0.24);
+  --backdrop: rgba(31, 36, 39, 0.24);
+  /* Type */
+  --ui: -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
+  --serif: "Literata", ui-serif, Georgia, serif;
+  --mono: ui-monospace, "SF Mono", Menlo, monospace;
+  /* The window's words: four sizes, each with its one line height (roadmap Batch 11, F-11).
+     Used whole, as in font: 600 var(--text-13); the line heights alone for the page's fonts. */
+  --line-11: 16px;
+  --line-12: 16px;
+  --line-13: 18px;
+  --line-15: 20px;
+  --text-11: 11px/var(--line-11) var(--ui);
+  --text-12: 12px/var(--line-12) var(--ui);
+  --text-13: 13px/var(--line-13) var(--ui);
+  --text-15: 15px/var(--line-15) var(--ui);
+  /* Gaps, margins and paddings */
+  --space-4: 4px;
+  --space-8: 8px;
+  --space-12: 12px;
+  --space-16: 16px;
+  --space-24: 24px;
+  --space-32: 32px;
+  --space-48: 48px;
+  --space-64: 64px;
+  /* A bar's boxes sit --edge in from the window's side; its words and icons start --bar-inset in. */
+  --edge: 16px;
+  --bar-inset: 24px;
+  /* Controls' heights: in a comment card and the status bar, most places, the toolbar. */
+  --control-small: 24px;
+  --control: 28px;
+  --control-large: 32px;
+}
+
+/* Dark: the same order of surfaces, just as muted. A page going to paper
+   (class on-paper) always keeps the light look. Each surface stands a step
+   apart from what's around it, what you click has an edge at 3 to 1 or more,
+   and the lines between areas are quieter than that (roadmap Batch 11, F-3,
+   from the design read's measurements). */
+@media (prefers-color-scheme: dark) {
+  :root:not(.on-paper) {
+    --chrome: #171B1E;
+    --ground: #1B2023;
+    --panel: #22282C;
+    --page: #262D31;
+    --side: #1B2023;
+    --button: #313A3F;
+    --float: #2E363A;
+    --chip: #2E363A;
+    --raw: #2E363A;
+    --hover: #384147;
+    --pressed: #434E55;
+    --chrome-line: #4A545A;
+    --float-edge: #707C83;    /* the toolbar's menus stand out from the panel and page behind, 3 to 1 or more (roadmap Batch 24, row 29) */
+    --control-line: #808C94;  /* 3 to 1 under the pointer too (roadmap Batch 12, G-14; it was #78858D) */
+    --card-line: #353D42;
+    --divider: #3A444A;
+    --float-hover: #32424A;
+    --hover-line: #84A6B5;
+    --ink: #E3E7E6;
+    --ink-soft: #A3AEB4;
+    --muted: #5F6A70;
+    --line-number: #8A959B;
+    --accent: #84A6B5;
+    --accent-strong: #97B5C2;
+    --accent-ink: #A9C6D3;
+    --focused-comment-ink: #E3E7E6;
+    --accent-tint: #2C3C43;
+    --accent-line: #3E535C;
+    --on-accent: #142024;
+    --card-focus: #2D3B42;
+    --coral-tint: #4A2E25;
+    --coral-line: #B9735C;
+    --comment-mark: #5A3F35;
+    --comment-mark-active: #7A4F42;
+    --change-mark: #2A3B4C;
+    --change-mark-line: #6F93B5;
+    --change-box-line: #6F93B5;
+    --warn-tint: #36261F;
+    --warn-line: #563A30;
+    --warning-ink: #EBA48D;
+    --diff-added: #35503C;
+    --diff-added-line: #6F9676;
+    --diff-removed: #D99A88;
+    --diff-removed-tint: #3D2A25;
+    --find-tint: #4A4329;
+    --find-current: #6B5B2A;
+    --read-mark: #2E3A40;
+    --read-word: #334349;
+    /* Deeper façades, so the light initial on them stays readable */
+    --agent-ink: #EEF0EF;
+    --agent-peach: #7A5A43;
+    --agent-sky: #4C6278;
+    --agent-mint: #48675A;
+    --agent-lilac: #625779;
+    --agent-ochre: #74653B;
+    --agent-rose: #754F52;
+    /* On the dark bars a dot's edge is its light pastel. */
+    --agent-peach-edge: #EFC9A9;
+    --agent-sky-edge: #B9CEE2;
+    --agent-mint-edge: #B4D7C7;
+    --agent-lilac-edge: #CEC1DF;
+    --agent-ochre-edge: #E8D49C;
+    --agent-rose-edge: #E9C0C0;
+    --callout-sky: #27333C;
+    --callout-mint: #263731;
+    --callout-ochre: #363326;
+    --callout-rose: #3A2B2D;
+    --callout-lilac: #312D3B;
+    --highlight-mark: #5A5128;
+    --menu-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+    --lift-shadow: 0 0 8px rgba(0, 0, 0, 0.75);
+    --backdrop: rgba(0, 0, 0, 0.4);
+  }
+}
+
+/* Base ------------------------------------------------------------------------- */
+
+* { box-sizing: border-box; }
+html, body { height: 100%; margin: 0; }
+body {
+  display: flex;
+  flex-direction: column;
+  background: var(--ground);
+  color: var(--ink);
+  font-family: var(--ui);
+}
+
+/* Buttons: one family. A plain button, the primary one (one per place), a
+   quiet text link, and icon buttons. */
+button {
+  height: var(--control);
+  padding: 0 var(--space-12);
+  border: 1px solid var(--control-line);
+  border-radius: 6px;
+  background: var(--button);
+  color: var(--ink);
+  font: 500 var(--text-12);
+  white-space: nowrap;
+}
+button:hover:not(:disabled) { background: var(--hover); }
+button:active:not(:disabled) { background: var(--pressed); }
+/* Greyed out, its edge steps back with its words. */
+button:disabled { border-color: var(--chrome-line); color: var(--muted); }
+/* The main button, big and small (the comments' Post, Reply, Save and Send): one look, pressed included
+   (roadmap Batch 22, item 5, E21-15). Listed, not :is(), so each keeps its own weight in the cascade. */
+button.primary, .comment-button.primary-small {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--on-accent);
+}
+button.primary:hover:not(:disabled), .comment-button.primary-small:hover:not(:disabled) { border-color: var(--accent-strong); background: var(--accent-strong); }
+button.primary:active:not(:disabled), .comment-button.primary-small:active:not(:disabled) { border-color: var(--accent-ink); background: var(--accent-ink); }
+button.primary:disabled, .comment-button.primary-small:disabled { border-color: var(--chrome-line); background: var(--panel); color: var(--muted); }
+.link-button {
+  height: var(--control-small);
+  padding: 0 var(--space-4);
+  border: none;
+  background: none;
+  color: var(--accent-ink);
+  font: 500 var(--text-12);
+}
+.link-button:hover:not(:disabled), .link-button:active:not(:disabled) { background: none; text-decoration: underline; text-underline-offset: 2px; }
+
+/* One focus ring, for keyboard use. The writing surfaces show their cursor instead. */
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.ProseMirror:focus-visible, .source:focus-visible { outline: none; }
+
+/* Text fields: one look. While typing, the window's one focus ring, so the field the keyboard is in shows
+   plainly in light and dark (roadmap Batch 12, G-11: the soft ring was 1.3 to 1 in dark). */
+.field input, .find-field, .comment-input {
+  height: var(--control);
+  padding: 0 var(--space-8);
+  border: 1px solid var(--control-line);
+  border-radius: 6px;
+  background: var(--page);
+  color: var(--ink);
+  font: var(--text-13);
+}
+.field input:focus, .find-field:focus, .comment-input:focus, .help-search:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+::placeholder { color: var(--ink-soft); opacity: 1; }
+input[type="radio"], input[type="checkbox"] { accent-color: var(--accent); }
+/* Selected text: soft blue-grey, not the Mac's bright highlight. */
+::selection { background: var(--accent-line); }
+
+/* Tabs ------------------------------------------------------------------------- */
+
+.tabs {
+  position: relative; /* where a tab is laid out along it, for dragging one (tab-drag.ts) */
+  flex: none;
+  display: flex;
+  align-items: flex-end;
+  gap: var(--space-4);
+  height: 36px;
+  padding: 0 var(--space-16);
+  background: var(--chrome);
+  border-bottom: 1px solid var(--chrome-line);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+/* The start screen is the whole window: no tabs, toolbar or (empty) status bar. */
+body:not(.has-docs) .tabs, body:not(.has-docs) .toolbar, body:not(.has-docs) .docs, body:not(.has-docs) .status-bar { display: none; }
+/* With one document open the tab bar goes; the window's title names it. */
+body.single-doc .tabs { display: none; }
+/* Tabs share the bar fairly (roadmap Batch 24, row 26): each grows by the same amount, up to its whole name, so a
+   name is cut only once the bar is full, short names stay whole and the long ones share what's left equally.
+   The name stops at 400 pixels, so one very long name doesn't take a wide window. */
+.tab {
+  flex: 1 1 0;
+  min-width: 112px; /* at its narrowest, a word or so of its name ("Board n…"), not two letters */
+  max-width: max-content;
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+  height: var(--control);
+  padding: 0 var(--space-4) 0 var(--space-8); /* its words at 24 from the window's edge, with the bar's other words */
+  border-radius: 6px 6px 0 0;
+  color: var(--ink-soft);
+  font: var(--text-12);
+  cursor: default;
+  user-select: none;
+  /* Its edge, for the tab in front and one being moved: drawn inside it, so its words don't move. */
+  --tab-edge: inset 1px 0 0 var(--chrome-line), inset -1px 0 0 var(--chrome-line), inset 0 1px 0 var(--chrome-line);
+}
+.tab:hover { background: var(--ground); color: var(--ink); }
+/* The keyboard on a tab: the focus ring inside it, since the bar would cut one outside. */
+.tab:focus-visible { outline-offset: -2px; }
+/* The tab in front joins the toolbar below it, with a blue-grey line along its top, so which one is in front
+   shows at 3 to 1 or more (roadmap Batch 12, G-5). */
+.tab[aria-selected="true"] {
+  box-shadow: inset 0 2px 0 var(--accent), var(--tab-edge);
+  background: var(--panel);
+  color: var(--ink);
+  font-weight: 500;
+}
+/* More tabs than fit (roadmap Batch 12, G-19): the bar leaves room at its end for All tabs, which lists them all. */
+.tabs.overflowing { margin-right: 36px; }
+.tabs-end {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  background: var(--chrome);
+  border-bottom: 1px solid var(--chrome-line);
+}
+.tabs-end[hidden], body.single-doc .tabs-end, body:not(.has-docs) .tabs-end { display: none; }
+.tabs-all {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--control);
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--ink-soft);
+}
+.tab-name { flex: 1; min-width: 0; max-width: 400px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* Whose turn (roadmap Batch 2, item 2): waiting for you, a dot filled in the colour of the agent it's
+   back from, edged like a comment card's "new" dot; while an agent edits, a small coquí in its colour
+   (below). The colour is set on it (--dot-colour); blue-grey when no agent is known. The edge is a
+   deeper tone of the same colour (in dark, a lighter one), so the dot shows plainly on the tab bar
+   (roadmap Batch 11, F-5). */
+.tab-dot {
+  flex: none;
+  box-sizing: border-box;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 2px solid var(--dot-edge, var(--accent-ink));
+  background: var(--dot-colour, var(--accent));
+}
+/* A dot's edge in each agent's colour: on the tab (app.ts sets data-colour), on a card (comments-panel.ts),
+   in the line when an agent is done (review.ts) and in the status bar (app.ts). */
+.tab-dot[data-colour="peach"], .card-new[data-colour="peach"], .agent-swatch[data-colour="peach"], .turn-dot[data-colour="peach"] { --dot-edge: var(--agent-peach-edge); }
+.tab-dot[data-colour="sky"], .card-new[data-colour="sky"], .agent-swatch[data-colour="sky"], .turn-dot[data-colour="sky"] { --dot-edge: var(--agent-sky-edge); }
+.tab-dot[data-colour="mint"], .card-new[data-colour="mint"], .agent-swatch[data-colour="mint"], .turn-dot[data-colour="mint"] { --dot-edge: var(--agent-mint-edge); }
+.tab-dot[data-colour="lilac"], .card-new[data-colour="lilac"], .agent-swatch[data-colour="lilac"], .turn-dot[data-colour="lilac"] { --dot-edge: var(--agent-lilac-edge); }
+.tab-dot[data-colour="ochre"], .card-new[data-colour="ochre"], .agent-swatch[data-colour="ochre"], .turn-dot[data-colour="ochre"] { --dot-edge: var(--agent-ochre-edge); }
+.tab-dot[data-colour="rose"], .card-new[data-colour="rose"], .agent-swatch[data-colour="rose"], .turn-dot[data-colour="rose"] { --dot-edge: var(--agent-rose-edge); }
+/* Without a dot, its room stays, unseen, after the name: a tab is as wide with a dot or a coquí as without,
+   so the tabs beside it never move under the pointer (roadmap Batch 11, F-4). Only the name moves over,
+   inside its own tab, and its words still start at 24 when there's no dot. */
+.tab-dot[hidden] { display: block; visibility: hidden; order: 1; }
+.tab-close { order: 2; }
+/* While an agent works on it (roadmap Batch 9, item 13): a small coquí where the ring was. It's drawn
+   16 pixels wide but takes only the dot's room, so the name doesn't move when it comes or goes. */
+.tab-dot[data-turn="editing"] { position: relative; border: none; border-radius: 0; background: none; }
+.tab-dot .coqui-frog { position: absolute; left: -3px; top: -1.5px; width: 16px; height: 12.5px; }
+/* The coquí (tab-coqui.ts): the agent's colour, edged in the ink the dot is edged in, so it reads on
+   the tab bar in light and dark, with light eyes and dark pupils in both. It hops from its feet. */
+.coqui-frog { --frog-colour: var(--accent); display: block; flex: none; transform-origin: 50% 100%; }
+.coqui-frog svg { display: block; width: 100%; height: 100%; overflow: visible; }
+.frog-edge { fill: var(--agent-ink); stroke: var(--agent-ink); stroke-width: 3.6; stroke-linejoin: round; }
+.frog-body { fill: var(--frog-colour); }
+.frog-eye { fill: var(--page); }
+.frog-pupil { fill: var(--agent-ink); }
+.frog-smile { fill: none; stroke: var(--agent-ink); stroke-width: 1.3; stroke-linecap: round; }
+@media (prefers-color-scheme: dark) {
+  :root:not(.on-paper) .frog-eye { fill: var(--ink); }
+  :root:not(.on-paper) .frog-pupil { fill: var(--chrome); }
+}
+/* Not saved, and needs the person (changed outside, moved, in the Trash, a
+   failed save): a warm mark, the status bar's warning colour, with why in its tooltip. */
+.tab-problem { flex: none; width: 8px; height: 8px; border-radius: 50%; background: var(--warning-ink); }
+.tab-problem[hidden] { display: none; }
+.tab-close {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: var(--control-small);
+  padding: 0;
+  border: none;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--ink-soft);
+  opacity: 0;
+}
+.tab:hover .tab-close, .tab[aria-selected="true"] .tab-close, .tab-close:focus-visible { opacity: 1; }
+.tab-close:hover:not(:disabled) { background: var(--hover); color: var(--ink); }
+/* Moving a tab (roadmap Batch 10, item 1): the tabs slide aside quickly to make room for one being
+   dragged, and back if it's put back; it lifts a little, solid, edged and with a soft shadow above the
+   others, and follows the pointer sideways. With Reduce Motion they jump. */
+.tab { transition: transform 0.12s ease-out; }
+.tab.lifted {
+  position: relative;
+  z-index: 1;
+  transition: none;
+  box-shadow: var(--tab-edge), var(--lift-shadow);
+  color: var(--ink);
+}
+.tab.lifted:not([aria-selected="true"]) { background: var(--ground); }
+.tab.lifted[aria-selected="true"] { box-shadow: inset 0 2px 0 var(--accent), var(--tab-edge), var(--lift-shadow); }
+@media (prefers-reduced-motion: reduce) {
+  .tab { transition: none; }
+}
+
+/* Toolbar: one row, grouped, always visible ---------------------------------------- */
+
+/* Its line at the foot is drawn inside its 48 pixels, so the 32-pixel buttons sit on whole pixels, 8 from
+   the top and the line (roadmap Batch 11, F-11). */
+.toolbar {
+  flex: none;
+  display: flex;
+  align-items: center;
+  min-height: 48px;
+  padding: 0 var(--space-16);
+  overflow: hidden; /* never wraps or scrolls sideways: what doesn't fit is in More */
+  background: var(--panel);
+  box-shadow: inset 0 -1px 0 var(--chrome-line);
+}
+.toolbar > *, .toolbar .tool-group > * { flex: none; }
+/* The room either side of a group's line is even (4 pixels), and 4 between the buttons in a group
+   (roadmap Batch 11, F-11: it was 6 and 2). */
+.tool-group { display: flex; align-items: center; gap: var(--space-4); padding-right: var(--space-4); }
+/* A short line between groups. */
+.tool-group + .tool-group::before {
+  content: "";
+  width: 1px;
+  height: 20px;
+  margin-right: var(--space-4);
+  background: var(--chrome-line);
+}
+.tool-spacer { flex: 1; }
+.toolbar button.tool {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-4);
+  min-width: 32px;
+  height: var(--control-large);
+  padding: 0 var(--space-8);
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--ink);
+  font: 500 15px/var(--line-15) var(--serif);
+  white-space: nowrap;
+}
+.toolbar button.tool svg { flex: none; }
+/* B, I and S are drawn as icons, at a size of their own; I and S keep the page's plain weight. */
+.toolbar button.tool b, .toolbar button.tool i, .toolbar button.tool s { font-size: 16px; line-height: 1; }
+.toolbar button.tool i, .toolbar button.tool s { font-weight: 400; }
+/* The same room each side, and between the icon, the words and the chevron (roadmap Batch 11, F-11). */
+.toolbar button.tool-menu, .toolbar button.tool.tool-text { gap: var(--space-4); padding: 0 var(--space-8); font: 500 var(--text-12); }
+/* The chevron is drawn with a pixel more blank room on its right than the icons have on their left:
+   it's set that pixel nearer the edge, so the room either side looks the same (roadmap Batch 9, item 7). */
+.toolbar button.tool-menu > svg:last-child { margin-right: -1px; }
+.toolbar button.tool:hover:not(:disabled) { background: var(--hover); }
+.toolbar button.tool:active:not(:disabled) { background: var(--pressed); }
+/* A button that is on, or whose menu is open: a blue-grey edge inside it says so at 3 to 1 or more
+   (roadmap Batch 12, G-5; the tint alone was 1.16 to 1). */
+.toolbar button.tool.on { background: var(--accent-tint); box-shadow: inset 0 0 0 1px var(--accent); color: var(--accent-ink); }
+.toolbar button.tool:disabled { background: transparent; color: var(--muted); }
+.toolbar button.tool[aria-expanded="true"] { background: var(--pressed); box-shadow: inset 0 0 0 1px var(--accent); }
+/* The paragraph style box draws its own arrow, the toolbar menus' chevron, as
+   far in from its right edge as the words are from its left (Orlando,
+   2026-11-12: "The dropdown arrow here is touching the right line. It needs
+   some margin on the right"). The Mac's own arrow sits against the edge
+   whatever the padding. The list that opens is still the Mac's. */
+.style-box { --room: 8px; /* left of the words, and right of the arrow */ position: relative; display: flex; }
+.style-select {
+  width: 128px;
+  height: var(--control-large);
+  padding: 0 calc(var(--room) + var(--space-16)) 0 var(--room);
+  border: 1px solid var(--control-line);
+  border-radius: 6px;
+  appearance: none;
+  background: var(--button);
+  color: var(--ink);
+  font: var(--text-13);
+}
+.style-select:disabled { color: var(--muted); }
+/* The arrow, in the words' colour. A capital's own edge sits about a pixel inside where its words start: the
+   arrow as far again, inside the box's border. */
+.style-box::after {
+  content: "";
+  position: absolute;
+  top: calc(50% - 2px);
+  right: calc(var(--room) + 2px);
+  width: 7px;
+  height: 4px;
+  background: var(--ink);
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='2.5 4 7 4' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m3.5 4.75 2.5 2.5 2.5-2.5'/%3E%3C/svg%3E") center / 7px 4px no-repeat;
+  pointer-events: none;
+}
+.style-box:has(.style-select:disabled)::after { background: var(--muted); }
+/* Formatted or Markdown: a two-part switch, the view shown raised, edged and filled like a button. */
+.mode-switch { display: flex; flex: none; padding: var(--space-4); border-radius: 8px; background: var(--chrome); }
+.mode-switch button {
+  height: var(--control-small);
+  padding: 0 var(--space-8);
+  border: 1px solid transparent;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--ink-soft);
+  font: 500 var(--text-12);
+}
+.mode-switch button:hover:not(:disabled) { background: transparent; color: var(--ink); }
+.mode-switch button.on, .mode-switch button.on:hover:not(:disabled) {
+  border-color: var(--accent); /* the view in front, edged like a button that is on (Batch 12, G-5) */
+  background: var(--button);
+  color: var(--ink);
+}
+.toolbar .export-group, .toolbar .more-group { margin-left: var(--space-8); padding-right: 0; }
+/* The Outline button's group, first on the bar (outline.ts): gone into More, it takes the line after it too. */
+.toolbar > .outline-tools.moved + .tool-group::before { content: none; }
+.toolbar .more-group::before { content: none; }
+
+/* One row at any width, never squeezed (src/renderer/more.ts). As the window
+   narrows: the buttons with names (Insert, Table, Comment, Show changes,
+   History, Export) show just their icons, the name staying as the tooltip;
+   then the least used items move into More; then, at the narrowest, the
+   spacing tightens. */
+.toolbar .moved, .toolbar button.tool.moved, .toolbar .more-group[hidden] { display: none; }
+.toolbar.icons-only button.tool-menu > span, .toolbar.icons-only button.tool-text > span:not(.tool-count) { display: none; }
+.toolbar.tight .tool-group { gap: 0; }
+.toolbar.tight .style-box { --room: 4px; }
+.toolbar.tight .style-select { width: 104px; padding-right: calc(var(--room) + var(--space-12)); } /* "Normal text" whole, in no more room */
+.toolbar.tight .mode-switch button { padding: 0 var(--space-4); }
+.toolbar.tight button.tool-text { padding: 0 var(--space-4); }
+.toolbar.tight .more-group { margin-left: var(--space-4); }
+/* The Comments button's count of open comments: a badge on its icon's corner, as the Mac badges a toolbar
+   item, so the button keeps its width and nothing beside it moves when the count comes or goes (roadmap
+   Batch 11, F-13). Its middle sits near the icon's top right corner, so the icon still reads, and a ring in
+   the bar's colour parts it from the icon's lines. */
+.toolbar .comments-tool { position: relative; }
+.toolbar .tool-count {
+  position: absolute;
+  top: -2px;
+  right: 0;
+  box-sizing: border-box;
+  min-width: 16px;
+  padding: 0 var(--space-4);
+  border-radius: 8px;
+  background: var(--accent-tint);
+  box-shadow: 0 0 0 2px var(--panel);
+  color: var(--accent-ink);
+  font: 600 var(--text-11);
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+  pointer-events: none;
+}
+.toolbar .tool-count[hidden] { display: none; }
+.toolbar button.tool.on .tool-count { background: var(--page); box-shadow: 0 0 0 2px var(--accent-tint); }
+.toolbar button.tool:hover:not(:disabled) .tool-count { box-shadow: 0 0 0 2px var(--hover); }
+
+/* Find bar, at the top of the page: like the lines about the document, it spans
+   the page only (find.ts puts it in the page's column, above them), and the
+   Comments or History column starts right under the toolbar. ------------------------ */
+
+.find-bar {
+  order: -1;
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+  padding: var(--space-8) var(--space-16);
+  background: var(--panel);
+  border-bottom: 1px solid var(--chrome-line);
+  font: var(--text-12);
+  color: var(--ink-soft);
+}
+.find-bar[hidden], body:not(.has-docs) .find-bar { display: none; }
+/* In a narrow page what doesn't fit goes onto a second line, never past the edge. */
+.find-row { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-8); }
+.find-row[hidden] { display: none; }
+/* The boxes give up room before anything goes onto another line, and Match case, Replace… and Done go
+   together when something must: Done never sits on a row of its own (review of Batch 11, B11R-3). */
+.find-field { flex: 1 1 120px; min-width: 120px; max-width: 280px; }
+.find-more { display: flex; flex: none; align-items: center; gap: var(--space-8); }
+.find-count { min-width: 72px; font-variant-numeric: tabular-nums; }
+.find-count.none { color: var(--warning-ink); }
+/* The two arrows: two buttons, 28 square and 4 apart, as Show changes' are (roadmap Batch 11, F-25). */
+.find-steps { display: flex; flex: none; gap: var(--space-4); }
+.find-bar .find-step {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: var(--control);
+  padding: 0;
+}
+.find-option { display: inline-flex; align-items: center; gap: var(--space-4); color: var(--ink); white-space: nowrap; user-select: none; }
+.find-option input { margin: 0; }
+.find-bar button[hidden] { display: none; }
+/* A narrow page (a narrow window with the Comments column): the boxes give up
+   room first and the buttons are a little tighter, so each line still holds
+   what belongs together: the box with its count and arrows, Match case with
+   Done, the replace box with its two buttons. */
+@container doc-main (max-width: 520px) {
+  .find-field { flex: 1 1 96px; min-width: 96px; max-width: 280px; }
+  .find-count { min-width: 56px; }
+  .find-bar button { padding: 0 var(--space-8); }
+}
+
+/* Open documents fill the space between the toolbar and the status bar --------------- */
+
+.docs { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+.doc { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+.doc[hidden] { display: none; }
+/* The page and a panel side by side. The page's column holds the lines and
+   banners about the document at its top, then the view, so they span the page
+   only and the Comments or History column starts right under the toolbar. */
+.doc-body { flex: 1; min-height: 0; display: flex; }
+.doc-main {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  /* Behind a line that has faded out and still keeps its room: the page. */
+  background: var(--page);
+  container: doc-main / inline-size;
+}
+/* The formatted view and the Markdown view take the same place, one at a time
+   (and a version from History, in their place), under the lines and banners. */
+.views { flex: 1; min-width: 0; min-height: 0; display: grid; grid-template: minmax(0, 1fr) / minmax(0, 1fr); }
+.views > * { grid-area: 1 / 1; min-width: 0; }
+/* The lines people drag to change a width: the side panel's left edge, and the
+   line between the Markdown text and its preview (columns.ts). Each catches the
+   pointer over 8 pixels, mostly on its right, clear of the scroll bar on its
+   left, and takes no room, so nothing moves when it appears. A thin accent line
+   shows under the pointer, while dragging and with the keyboard. */
+.column-handle {
+  position: relative;
+  z-index: 2;
+  flex: none;
+  width: 8px;
+  margin: 0 -6px 0 -2px;
+  cursor: col-resize;
+  touch-action: none;
+}
+.column-handle::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 1px;
+  width: 2px;
+}
+.column-handle:hover::after, .column-handle.dragging::after { background: var(--accent); }
+/* With the keyboard: a ring like every other control's, drawn inside the line's own box so no edge of it is cut,
+   and above the panel's heading, which covered part of it (roadmap Batch 24, row 30: K-17). */
+.column-handle:focus-visible { z-index: 4; outline: 2px solid var(--accent); outline-offset: -2px; border-radius: 4px; }
+/* While dragging, the pointer keeps its shape and no text gets selected. */
+body.resizing-columns, body.resizing-columns * { cursor: col-resize !important; user-select: none; }
+
+/* Banners at the top of the page: a change outside Corillo, a moved file,
+   brought-back edits (warm), a version shown or an agent editing (blue-grey).
+   They span the page, not the side column. Their buttons, one kind in every
+   bar, come right after the words, not at the far end (review of Batch 11,
+   F-10). Words too long to sit beside the buttons take the whole line, and
+   the buttons go under them, rather than squeezing the words into a tall thin
+   column. */
+.banner, .agent-notice {
+  flex: none;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-8) var(--space-12);
+  min-height: 44px;
+  padding: var(--space-8) var(--space-16) var(--space-8) var(--space-24); /* its words at 24 from the window's edge, its buttons 16 from the right */
+  background: var(--warn-tint);
+  border-bottom: 1px solid var(--warn-line);
+  color: var(--ink);
+  font: var(--text-13);
+}
+.banner > span { flex: 0 1 auto; min-width: 0; }
+.banner[hidden], .agent-notice[hidden], .banner.version-banner button[hidden] { display: none; }
+.banner button { flex: none; }
+.banner.version-banner, .agent-notice { background: var(--accent-tint); border-bottom-color: var(--accent-line); }
+/* An agent's dot, edged as the tab's dot is (roadmap Batch 12, G-13). */
+.agent-swatch { flex: none; box-sizing: border-box; width: 12px; height: 12px; border: 2px solid var(--dot-edge, var(--accent-ink)); border-radius: 50%; background: var(--muted); }
+
+/* The two lines about whose turn it is (turns.ts, review.ts): "Claude is
+   editing" with Take over, then "Claude is done. Back to you. 3 comments to
+   read." in the same place at the same height (the 28-pixel button and
+   8 pixels above and below it, and the rule under it), so the page doesn't
+   move when one replaces the other. One line each, at any width: words that
+   don't fit end in an ellipsis, and all of them are in the tooltip. The hint,
+   and what's left to read, give up their room long before the words before
+   them, so the buttons stay right after the words. */
+.agent-notice, .pass-notice { flex-wrap: nowrap; height: 45px; white-space: nowrap; }
+.agent-notice-text { flex: 0 1 auto; min-width: 0; overflow: hidden; font-weight: 600; text-overflow: ellipsis; }
+.agent-notice-hint { flex: 0 1000 auto; min-width: 0; overflow: hidden; color: var(--ink-soft); text-overflow: ellipsis; }
+/* Typed on while the agent has it: the hint says why nothing happened, in the line's own ink (roadmap Batch 24, row 21). */
+.agent-notice-hint.agent-notice-typed { color: var(--ink); }
+.agent-notice .take-over, .agent-notice .agent-notice-help { flex: none; }
+/* The same coquí as on the tab, before the words (roadmap Batch 9, item 13). */
+.agent-notice .coqui-frog { width: 20px; height: 15.5px; }
+/* A narrow page keeps the agent's name and Take over; "How this works" is in Help. */
+@container doc-main (max-width: 520px) {
+  .agent-notice-help { display: none; }
+}
+@container doc-main (max-width: 400px) {
+  .agent-notice-hint { display: none; }
+}
+.pass-notice {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: var(--space-12);
+  padding: var(--space-8) var(--space-16) var(--space-8) var(--space-24);
+  border-bottom: 1px solid var(--accent-line);
+  background: var(--accent-tint);
+  color: var(--ink);
+  font: var(--text-13);
+}
+.pass-notice[hidden], .doc-main:has(> .agent-notice:not([hidden])) > .pass-notice { display: none; }
+.pass-notice-swatches { flex: none; display: inline-flex; gap: var(--space-4); }
+/* Who is done keeps its words before what's left to read gives up any. */
+.pass-notice-lead { flex: 0 1 auto; min-width: 0; overflow: hidden; font-weight: 600; text-overflow: ellipsis; }
+.pass-notice-detail { flex: 0 1000 auto; min-width: 0; overflow: hidden; color: var(--ink-soft); text-overflow: ellipsis; }
+/* Show changes, right after the words, when the pass changed text no comment asked for (roadmap Batch 9, item 5;
+   review of Batch 11, F-9, F-10). In a narrow page it keeps its name, and the words before it make room instead
+   (F-23): what's left to read goes whole, never cut to "4…" (the Comments panel beside it counts the same, and
+   the tooltip has it all); in the narrowest, "Back to you." goes too, so who is done reads whole. */
+.pass-notice-see { flex: none; }
+.pass-notice-see[hidden] { display: none; }
+@container doc-main (max-width: 480px) {
+  .pass-notice:has(> .pass-notice-see:not([hidden])) > .pass-notice-detail { display: none; }
+}
+@container doc-main (max-width: 380px) {
+  .pass-notice:has(> .pass-notice-see:not([hidden])) .pass-notice-back { display: none; }
+}
+@container doc-main (max-width: 370px) {
+  .pass-notice-detail { display: none; }
+}
+/* Once the person starts working it fades out; its room stays, empty, until
+   giving it back moves nothing on screen (review.ts). */
+.pass-notice { transition: opacity 200ms ease; }
+.pass-notice.spent { opacity: 0; visibility: hidden; pointer-events: none; transition: opacity 200ms ease, visibility 0s linear 200ms; }
+/* Show changes and an earlier version take the page's place, and their bar
+   takes the line's: one bar at a time, and nothing offers to show what is
+   already shown (review of Batch 11, F-9). The line, or its empty room, is
+   there again, as it was, on coming back. */
+.doc.viewing-version .pass-notice { display: none; }
+/* The line's words for a screen reader: always on the page, out of sight (review.ts). */
+.pass-notice-said { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+
+/* The page ------------------------------------------------------------------------- */
+
+.canvas {
+  flex: 1;
+  overflow-y: auto;
+  background: var(--page);
+  padding: 24px 16px 64px;
+  container-type: inline-size;
+}
+.split[hidden], .canvas[hidden] { display: none; }
+/* The editor's scrolling area holds the page, in a column as wide as the
+   space beside the side panel. */
+.canvas.with-side {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  padding: 0;
+  container-type: normal;
+}
+/* A view out of sight is skipped, not taken apart: it keeps its layout (every
+   line already measured and set in the page's font), so switching back to it
+   on a long document doesn't lay all of it out again. It can't be seen,
+   clicked or reached with the keyboard, as if it were gone. The formatted view
+   is always kept so. The Markdown view is kept only until the document changes
+   in the formatted view (kept in doc-tab.ts, let go in doc-tab-markdown.ts's
+   unkeepMarkdown): anything kept out of sight makes each keystroke there a
+   little slower, and typing matters more.
+   In the formatted view it's the page's column that is skipped, not the
+   scrolling area itself: Chromium, skipping a scrolling area that was
+   scrolled, then laid out and restyled while out of sight (Show changes, an
+   earlier version, the Markdown view), left words typed or put back in it
+   later undrawn on the page, though they were in the file (review of Batch 11,
+   F-1). Its column keeps its last height while skipped, so the scroll stays. */
+.canvas.with-side[hidden], .split.kept[hidden] { display: grid; visibility: hidden; }
+.split.kept[hidden] { content-visibility: hidden; }
+.canvas.with-side > .page-column { contain-intrinsic-height: auto none; }
+.canvas.with-side[hidden] > .page-column, .doc.viewing-version .canvas.with-side > .page-column { content-visibility: hidden; visibility: hidden; }
+/* With a mouse connected, the Mac shows scroll bars that take room. The room
+   is always kept, so a view coming back into sight is exactly as wide as when
+   it was laid out and isn't laid out again (and the page doesn't shift sideways
+   when a document grows longer than the window). */
+.canvas, .source, .preview-pane { scrollbar-gutter: stable; }
+/* Only the view itself is hidden that way: what's inside keeps its own style,
+   so nothing in a long document has to be restyled on switching. */
+.canvas.with-side > *, .split > * { visibility: visible; }
+.page-column > .page { visibility: visible; }
+.page-column { min-width: 0; padding: 24px 16px 64px; container-type: inline-size; }
+.page {
+  max-width: 760px;
+  min-height: 100%;
+  margin: 0 auto;
+  padding: 64px 80px;
+  background: var(--page);
+}
+/* View > Page Width > Wide: the text spans the space beside the side panel,
+   keeping the page's margins either side, up to about 100 characters a line
+   (760 pixels of 17-pixel Literata); past that the page stays centred, so a
+   big screen never runs lines edge to edge (Orlando). */
+:root[data-page-width="fill"] .page { max-width: 920px; }
+/* Zoom scales the page, not the toolbar, as in Word. */
+.page, .source, .find-marks { zoom: var(--page-zoom, 1); }
+#zoom-level[hidden] { display: none; }
+
+.ProseMirror {
+  outline: none;
+  color: var(--ink);
+  font-family: var(--serif);
+  font-size: 17px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+.ProseMirror[contenteditable="false"] { cursor: default; }
+/* Space between blocks (Orlando, 2026-11-09: "An empty line in markdown doc
+   should show up as an empty line in word"): each blank line of the file is
+   one empty line of the text's own height, and nothing else is. The blank
+   line Markdown needs between two blocks is the line above the second;
+   each blank line beyond it is an empty paragraph, one line tall
+   (markdown-read.ts, emptyLines). Blocks the file writes with no blank
+   line between them sit close; so does what follows an empty line
+   (blank-lines.ts marks both). The line is the body text's, whatever the
+   block's own size. */
+@property --line { syntax: "<length>"; inherits: true; initial-value: 0px; }
+.ProseMirror { --line: 1lh; }
+.ProseMirror > :not(:first-child) { margin-top: var(--line); }
+.ProseMirror > .joined, .ProseMirror > .after-empty { margin-top: 0; }
+/* With Show changes, a block that went, drawn straight after an empty line, is what sits close under it. */
+.ProseMirror > .empty-line + .diff-removed-block { margin-top: 0; }
+.ProseMirror > .diff-removed-block + .after-empty { margin-top: var(--line); }
+/* An empty line holding only Shift-Return line breaks is saved as one blank
+   line, so it's one line tall (review R-EL-10): only the line the cursor
+   sits on shows. */
+.ProseMirror > .empty-line > br:not(.ProseMirror-trailingBreak) { display: none; }
+/* Inside a list spaced with blank lines, and a quote, the same: a line
+   between two parts, unless the file writes them close (keeping it simple,
+   one line however many blank lines the file has there). A list written
+   without blank lines is close all through. */
+.ProseMirror :is(ul, ol):not([data-tight]) > li:not(:first-of-type),
+.ProseMirror :is(ul, ol):not([data-tight]) > li > :not(:first-child),
+.ProseMirror blockquote > :not(:first-child) { margin-top: var(--line); }
+.ProseMirror :is(ul, ol):not([data-tight]) > li.joined,
+.ProseMirror :is(ul, ol):not([data-tight]) > li > .joined,
+.ProseMirror blockquote > .joined { margin-top: 0; }
+/* The cursor between two blocks, and numbers, take no room. */
+.ProseMirror > .ProseMirror-gapcursor { margin: 0; }
+/* The page previews the Word document (Orlando): headings, lists, quotes and
+   tables keep the sizes of Corillo's Word style (src/main/reference-docx.ts),
+   relative to the body text: headings 18, 14, 12, 11, 11 (italic) and 10
+   points against 11. Headings have a little room above and below them, as in
+   Word; other blocks only the blank lines around them. Word's text has no
+   colour; on the page only, headings are in the blue-grey ink, to help find
+   your way round the document (readable on light and dark pages). */
+.ProseMirror h1, .ProseMirror h2, .ProseMirror h3,
+.ProseMirror h4, .ProseMirror h5, .ProseMirror h6 { margin: 0; padding: calc(var(--line) * 0.35) 0 calc(var(--line) * 0.17); line-height: 1.25; color: var(--accent-ink); }
+.ProseMirror h1 { font-size: 1.64em; }
+.ProseMirror h2 { font-size: 1.27em; }
+.ProseMirror h3 { font-size: 1.09em; }
+.ProseMirror h4 { font-size: 1em; }
+.ProseMirror h5 { font-size: 1em; font-style: italic; }
+.ProseMirror h6 { font-size: 0.91em; }
+.ProseMirror p { margin: 0; }
+.ProseMirror ul, .ProseMirror ol { margin: 0; padding-left: 1.6em; }
+.ProseMirror li > * { margin-bottom: 0; }
+.ProseMirror li::marker { color: var(--ink-soft); }
+/* A task list item's box, as Word draws it. Clicking the box ticks it (tasks.ts). */
+.ProseMirror li.task { list-style-type: "\2610\2002"; }
+.ProseMirror li.task[data-checked="true"] { list-style-type: "\2612\2002"; }
+.ProseMirror li.task::marker { font-family: var(--ui); }
+.ProseMirror blockquote {
+  margin: 0;
+  padding-left: 1em;
+  border-left: 3px solid var(--accent-line);
+}
+.ProseMirror a { color: var(--accent-ink); text-decoration-thickness: 1px; text-underline-offset: 0.15em; }
+.ProseMirror code { padding: 0.1em 0.3em; border-radius: 4px; background: var(--raw); font-family: var(--mono); font-size: 0.88em; }
+.ProseMirror pre {
+  margin: 0;
+  padding: 12px 16px;
+  border-radius: 6px;
+  background: var(--raw);
+  font-family: var(--mono);
+  font-size: 14px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  tab-size: 4;
+}
+.ProseMirror pre code { padding: 0; background: none; font-size: inherit; }
+/* A rule is one line of the text's height (its line in the file), drawn across its middle. */
+.ProseMirror hr { box-sizing: border-box; height: var(--line); margin: 0; border: none; padding: calc(var(--line) / 2 - 0.5px) 0; background: var(--chrome-line); background-clip: content-box; }
+.ProseMirror img { max-width: 100%; height: auto; }
+/* In dark a picture is softened a little, so a white one doesn't glare on the dark page (F-3). */
+@media (prefers-color-scheme: dark) {
+  :root:not(.on-paper) :is(.ProseMirror, .recent-page) img { filter: brightness(0.9); }
+}
+
+/* Pictures: each takes the share of the text's width it will have in Word
+   (sizeAsInWord in images.ts sets the width). */
+.ProseMirror .picture { display: inline-block; max-width: 100%; }
+.ProseMirror .picture[data-points] img { display: block; width: 100%; }
+.ProseMirror .picture.selected img { outline: 2px solid var(--accent); outline-offset: 2px; }
+.ProseMirror .picture.missing {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 12px;
+  border: 1px dashed var(--warn-line);
+  border-radius: 6px;
+  background: var(--warn-tint);
+  color: var(--ink);
+  font: var(--text-13);
+}
+/* In a narrow window the words give way (a long name breaks), so Find it… stays inside the box. */
+.ProseMirror .picture.missing .picture-missing-text { min-width: 0; overflow-wrap: anywhere; }
+.ProseMirror .picture.missing button { flex: none; }
+/* A web picture an agent added, waiting for the person to show it (roadmap Batch 18, item 1): its address, and Show picture. */
+.picture.waiting {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  max-width: 100%;
+  padding: 8px 12px;
+  border: 1px dashed var(--control-line);
+  border-radius: 6px;
+  background: var(--raw);
+  color: var(--ink);
+  font: var(--text-13);
+  text-decoration: none;
+}
+.picture.waiting .picture-waiting-text { min-width: 0; overflow-wrap: anywhere; }
+.picture.waiting button { flex: none; }
+/* A diagram's pictures from the web that wait (the review of Batch 18, R18-2): a marker for each, above the drawing. */
+/* (Below the Edit diagram code button, which sits at the diagram's top right.) */
+.ProseMirror .diagram-waiting { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; padding-top: 32px; }
+.ProseMirror .diagram-waiting[hidden] { display: none; }
+
+/* Tables */
+/* As in Word: no lines down the sides, a rule under the header row and light
+   ones between rows. The faint dotted lines between cells only help editing,
+   like Word's gridlines, and stay off paper. */
+.ProseMirror table { margin: 0; border-collapse: collapse; font-size: 0.91em; table-layout: auto; }
+.ProseMirror th, .ProseMirror td {
+  position: relative;
+  min-width: 3em;
+  padding: 6px 10px;
+  border: none;
+  border-bottom: 1px solid var(--divider);
+  vertical-align: top;
+  /* Spaces typed in a cell take up room, so the cursor moves with them. */
+  white-space: break-spaces;
+}
+.ProseMirror :is(th, td) + :is(th, td) { border-left: 1px dotted var(--chrome-line); }
+.ProseMirror tr:last-child > :is(th, td) { border-bottom-color: var(--chrome-line); }
+.ProseMirror th { border-bottom: 2px solid var(--chrome-line); font-weight: 600; text-align: left; }
+.ProseMirror .selectedCell::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--accent-tint);
+  opacity: 0.6;
+  pointer-events: none;
+}
+.ProseMirror-hideselection *::selection { background: transparent; }
+.ProseMirror-hideselection { caret-color: transparent; }
+
+/* Footnotes: numbered by the editor, in reading order. */
+.ProseMirror .footnote-ref { padding: 0 1px; color: var(--accent-ink); font-family: var(--ui); font-size: 0.7em; cursor: pointer; }
+.ProseMirror .footnote-ref::after { content: attr(data-number); }
+.ProseMirror .footnote-def {
+  padding-left: 1.8em;
+  text-indent: -1.8em;
+  font-size: 0.88em;
+}
+.ProseMirror .footnote-def::before { content: attr(data-number) "."; display: inline-block; width: 1.8em; text-indent: 0; color: var(--accent-ink); }
+/* The first of a run of notes has a rule above it. A blank line's number
+   (.ln-blank, line-numbers.ts) between two notes leaves them one run. */
+.ProseMirror .footnote-def:first-of-type,
+.ProseMirror :not(.footnote-def, .ln-blank) + .footnote-def,
+.ProseMirror :not(.footnote-def) + .ln-blank + .footnote-def { padding-top: 0.6em; border-top: 1px solid var(--chrome-line); }
+
+/* Diagrams: drawn from their code, which shows while the cursor is in it. */
+.ProseMirror .diagram { position: relative; }
+.ProseMirror .diagram-picture { display: flex; justify-content: center; min-height: 40px; padding: 12px 0; }
+.ProseMirror .diagram-picture svg { max-width: 100%; height: auto; }
+.ProseMirror .diagram > pre { display: none; }
+.ProseMirror .diagram.show-code > pre, .ProseMirror .diagram.has-cursor > pre, .ProseMirror .diagram.has-error > pre { display: block; }
+.ProseMirror .diagram-toggle {
+  position: absolute;
+  top: 4px;
+  right: 0;
+  height: 24px;
+  padding: 0 8px;
+  opacity: 0;
+  transition: opacity 120ms;
+}
+.ProseMirror .diagram:hover .diagram-toggle, .ProseMirror .diagram.show-code .diagram-toggle, .ProseMirror .diagram-toggle:focus-visible { opacity: 1; }
+.ProseMirror .diagram-error { margin: 0; color: var(--warning-ink); font: var(--text-13); }
+/* Where diagrams are drawn before they're shown: laid out as wide as the window, but out of sight and out of its flow. */
+.diagram-workspace { position: fixed; left: 0; top: 0; width: 100%; visibility: hidden; pointer-events: none; z-index: -1; }
+
+.ProseMirror-gapcursor { display: none; pointer-events: none; position: absolute; }
+.ProseMirror-gapcursor::after {
+  content: "";
+  display: block;
+  position: absolute;
+  top: -2px;
+  width: 20px;
+  border-top: 1px solid var(--ink);
+  animation: gapcursor-blink 1.1s steps(2, start) infinite;
+}
+@keyframes gapcursor-blink { to { visibility: hidden; } }
+/* With less motion asked for in the Mac's settings, the few fades (the done
+   line, a diagram's Show code button) happen at once. The line numbers'
+   following of the text's scrolling isn't motion of its own and stays. */
+@media (prefers-reduced-motion: reduce) {
+  .pass-notice, .pass-notice.spent, .ProseMirror .diagram-toggle { transition: none; }
+}
+.ProseMirror-focused .ProseMirror-gapcursor { display: block; }
+.drop-cursor { background: var(--accent); }
+
+/* Markdown the editor doesn't show richly: shown as its source. */
+.ProseMirror pre.raw-block { position: relative; border: 1px dashed var(--chrome-line); background: var(--panel); }
+.ProseMirror pre.raw-block::before {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--ink-soft);
+  font: 600 12px var(--ui);
+  content: "Shown as Markdown";
+}
+.ProseMirror pre.raw-block[data-kind="table"]::before { content: "Table, shown as Markdown"; }
+.ProseMirror pre.raw-block[data-kind="front-matter"]::before { content: "Document details"; }
+.ProseMirror pre.raw-block[data-kind="definitions"]::before { content: "Footnote, shown as Markdown"; }
+/* Link definitions only help the links work: Word and PDF leave them out, so they're faint. */
+.ProseMirror pre.raw-block[data-kind="links"] { color: var(--ink-soft); }
+.ProseMirror pre.raw-block[data-kind="links"]::before { content: "Link definitions, left out of Word"; }
+.ProseMirror pre.raw-block[data-kind="html"]::before { content: "HTML"; }
+
+/* Comments on the text: soft flamboyán coral, stronger for the one in focus. */
+.ProseMirror .comment-range { background: var(--comment-mark); }
+.ProseMirror .comment-range.active,
+.ProseMirror .comment-range.draft { background: var(--comment-mark-active); box-shadow: inset 0 -2px 0 var(--coral-line); }
+/* A heading's or a link's blue-grey on the deeper coral: in dark it takes the ink, to stay readable (Batch 12, G-12). */
+.ProseMirror :is(h1, h2, h3, h4, h5, h6, a) .comment-range:is(.active, .draft),
+.ProseMirror .comment-range:is(.active, .draft) :is(a, .footnote-ref) { color: var(--focused-comment-ink); }
+
+/* Find: every match, the current one stronger. */
+/* Found words take the text's own ink, so they stay readable on the find colours in a coloured heading or link too. */
+.ProseMirror .find-match { border-radius: 2px; background: var(--find-tint); color: var(--ink); }
+.ProseMirror .find-match.current { background: var(--find-current); }
+/* The same, on a version shown read-only (drawn as the browser's highlights). */
+::highlight(find-match) { background-color: var(--find-tint); color: var(--ink); }
+::highlight(find-current) { background-color: var(--find-current); color: var(--ink); }
+
+/* What changed: added words highlighted, removed words struck through. */
+.ProseMirror ins.diff-added { border-radius: 2px; background: var(--diff-added); box-shadow: 0 1px 0 var(--diff-added-line); text-decoration: none; }
+.ProseMirror del.diff-removed { margin-right: 2px; color: var(--diff-removed); text-decoration: line-through; text-decoration-thickness: 1px; }
+/* A picture that went: faded, with a line round it in the removed colour. */
+.ProseMirror del.diff-removed img { opacity: 0.5; outline: 2px solid var(--diff-removed); outline-offset: 2px; }
+.ProseMirror .diff-added-block { border-radius: 3px; background: var(--diff-added); box-shadow: 0 0 0 4px var(--diff-added); }
+.ProseMirror .diff-removed-block { border-radius: 3px; background: var(--diff-removed-tint); box-shadow: 0 0 0 4px var(--diff-removed-tint); color: var(--diff-removed); text-decoration: line-through; text-decoration-thickness: 1px; }
+.ProseMirror .diff-removed-block img { opacity: 0.5; }
+.ProseMirror .diff-changed-block { border-radius: 3px; background: var(--accent-tint); box-shadow: 0 0 0 4px var(--accent-tint); }
+.ProseMirror tr.diff-added-block, .ProseMirror tr.diff-removed-block, .ProseMirror tr.diff-changed-block { box-shadow: none; }
+.ProseMirror tr.diff-added-block > * { background: var(--diff-added); }
+.ProseMirror tr.diff-removed-block > * { background: var(--diff-removed-tint); }
+
+/* A blank document's words on how to start (roadmap Batch 5, item 2, P-8):
+   drawn on the page after the text, never in it, so the file, the empty-lines
+   rule and the line numbers don't know they're there. The first line sits on
+   the empty line the cursor is in, in the page's own type, as faint as a
+   field's placeholder; the rest below it. Clicks go through to the page,
+   except on Copy. */
+.blank-hint { margin-top: -1lh; color: var(--ink-soft); font: 17px/1.6 var(--serif); pointer-events: none; user-select: none; }
+.blank-hint[hidden] { display: none; }
+.blank-hint > div { margin: 0; }
+.blank-hint .blank-hint-ask, .blank-hint .blank-hint-word { font: 13px/1.5 var(--ui); }
+.blank-hint .blank-hint-ask { margin-top: 16px; }
+.blank-hint .blank-hint-word { margin-top: 4px; }
+.blank-hint .link-button { padding: 0; font-size: 13px; pointer-events: auto; }
+.blank-hint-copied { color: var(--ink-soft); }
+
+/* Line numbers (View > Line Numbers): the file's own line numbers, small and quiet
+   in the page's left margin, beside the first line of each block and each line
+   of code. Drawn beside the text, never in it, so the text never moves.
+   Lighter than the page's other small words, and 24 pixels from the text where
+   the page has its full margins (Orlando, 2026-11-12: "I think the line numbers
+   are too dark and distracting. Can we make them a bit more subtle. In part
+   because they're still pretty close to the text IMO."); still readable at
+   their size (4.5 to 1 against the page). */
+.line-numbers .editor > .ProseMirror { position: relative; }
+.ProseMirror .ln::before, .ProseMirror .ln-line, .ProseMirror .ln-blank, .ProseMirror .ln-end::after {
+  position: absolute;
+  right: calc(100% + 24px);
+  color: var(--line-number);
+  font: 400 11px var(--ui);
+  font-variant-numeric: tabular-nums;
+  line-height: 1lh; /* the line beside it, so the number sits in its middle */
+  letter-spacing: normal;
+  text-align: right;
+  text-indent: 0;
+  white-space: nowrap;
+  user-select: none;
+  pointer-events: none;
+}
+.ProseMirror .ln::before, .ProseMirror .ln-line::before, .ProseMirror .ln-blank::before { content: attr(data-ln) / ""; }
+/* A row's words start below its cell padding. */
+.ProseMirror .ln-row::before { margin-top: 6px; }
+/* Lines with no words of their own (Orlando, 2026-11-09): a blank line's
+   number fills the line of space before the next block; a code block's fences
+   sit in its room above and below the code; a table's row of dashes, just
+   above the first row's number, by the rule under the header. None of them
+   takes room. */
+.ProseMirror .ln-blank { display: block; margin: 0 !important; line-height: var(--line); }
+.ProseMirror pre.ln-fence::before { margin-top: -12px; line-height: 12px; }
+.ProseMirror pre.ln-end::after { content: attr(data-end) / ""; display: block; line-height: 12px; }
+.ProseMirror .ln-row.ln-dash::before { content: attr(data-dash) "\A" attr(data-ln) / ""; white-space: pre; margin-top: calc(6px - 1lh); }
+/* Inside a block shown as Markdown, measured from inside its 1px border. */
+.ProseMirror pre.raw-block .ln-line { right: calc(100% + 25px); }
+/* A narrower page has narrower margins (below): the numbers come closer, so they stay on the page. */
+@container (max-width: 680px) {
+  .ProseMirror .ln::before, .ProseMirror .ln-line, .ProseMirror .ln-blank, .ProseMirror .ln-end::after { right: calc(100% + 16px); }
+  .ProseMirror pre.raw-block .ln-line { right: calc(100% + 17px); }
+}
+@container (max-width: 480px) {
+  .ProseMirror .ln::before, .ProseMirror .ln-line, .ProseMirror .ln-blank, .ProseMirror .ln-end::after { right: calc(100% + 8px); }
+  .ProseMirror pre.raw-block .ln-line { right: calc(100% + 9px); }
+}
+
+/* A version shown in place of the editor. The editor is kept out of sight the
+   way a view is (above), so going back to it doesn't lay out a long document
+   again. */
+.doc.viewing-version .canvas.with-side, .doc.viewing-version .split { visibility: hidden; }
+.doc.viewing-version .split { content-visibility: hidden; }
+.version-page:focus { outline: none; }
+/* The page shown read-only has no cursor: the keyboard on it shows as the window's ring, inside its edges so the
+   bar above never covers it (Batch 24, K-3). */
+.version-page:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+.version-missing { color: var(--ink-soft); font: var(--text-13); }
+/* Show changes keeps the Comments column beside the page (the rule above
+   hides it only for a version picked in History). Its banner has arrows to
+   step through the changes, the place they're on ("3 of 18"), and the change
+   they're on is ringed. */
+.version-steps { display: flex; flex: none; align-items: center; gap: var(--space-4); }
+.version-steps[hidden] { display: none; }
+.version-step { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: var(--control); padding: 0; }
+.version-step-place { color: var(--ink-soft); font-variant-numeric: tabular-nums; white-space: nowrap; }
+/* What a step says, for a screen reader only. */
+.version-step-said { position: absolute; font: var(--text-12); width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+/* Read Aloud's bar (roadmap Batch 14, item 4), blue-grey like a version's: "Reading aloud", then Back a
+   sentence, Pause or Resume and Next sentence as 28-pixel squares 4 apart (Show changes' arrows), then Stop.
+   On the page, the sentence being read is marked softly, and the word being said a step deeper, behind the
+   words, which keep their ink (the browser's own highlights: nothing on the page moves for them). */
+.banner.read-aloud-bar { background: var(--accent-tint); border-bottom-color: var(--accent-line); }
+.read-aloud-words { white-space: nowrap; }
+.read-aloud-steps { display: flex; flex: none; align-items: center; gap: var(--space-4); }
+.read-aloud-step { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: var(--control); padding: 0; }
+::highlight(read-aloud-sentence) { background-color: var(--read-mark); }
+::highlight(read-aloud-word) { background-color: var(--read-word); text-decoration: underline var(--accent); }
+.version-step-place:empty { display: none; }
+.ProseMirror .diff-current { outline: 2px solid var(--accent); outline-offset: 2px; }
+/* A card's note on its change ("Claude changed the highlighted text.", "You changed …") points at the
+   highlight on the document, which Show changes puts out of sight: it waits until Show changes is off
+   (review of Batch 11, F-16). */
+.doc.viewing-changes .comment-card .comment-change { display: none; }
+
+/* Markdown view: the text on the left, a preview on the right --------------------------- */
+
+.split { flex: 1; display: grid; grid-template-columns: 1fr 1fr; min-height: 0; --source-left: 32px; }
+/* With line numbers on, the text moves right to leave a clear gap after them. */
+body.line-numbers .split { --source-left: 52px; }
+.source {
+  /* line-numbers.ts adds a sliver to the bottom padding (here and on the copies laid over it), so the text's height is a whole number of pixels. */
+  padding: 32px 32px 32px var(--source-left);
+  border: none;
+  border-right: 1px solid var(--chrome-line);
+  background: var(--page);
+  color: var(--ink);
+  font: 14px/1.6 var(--mono);
+  outline: none;
+  resize: none;
+  tab-size: 4;
+}
+.source[readonly] { cursor: default; }
+.preview-pane { overflow-y: auto; padding: 24px 16px 64px; container-type: inline-size; background: var(--page); }
+.preview { padding: 48px 56px; }
+/* In the Markdown view, Find's matches are drawn on a layer behind the text,
+   set exactly like it. */
+.split > .source, .split > .find-marks { grid-row: 1; grid-column: 1; }
+.split > .preview-pane { grid-row: 1; grid-column: 2; }
+/* The line between the two, at the preview's left edge; columns.ts sets the widths. */
+.split > .split-handle { grid-row: 1; grid-column: 2; justify-self: start; }
+/* Too narrow for both halves, the preview gives way and the text takes the view (columns.ts; roadmap Batch 11,
+   F-18). The text's edge stays, unseen, so it wraps as its copies do. */
+.split.text-only > :is(.preview-pane, .split-handle) { display: none; }
+.split.text-only > .source { border-right-color: transparent; }
+.find-marks {
+  position: relative;
+  overflow: hidden;
+  padding: 32px 32px 32px var(--source-left);
+  border-right: 1px solid transparent;
+  background: var(--page);
+  color: transparent;
+  font: 14px/1.6 var(--mono);
+  tab-size: 4;
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+  pointer-events: none;
+}
+.find-marks[hidden] { display: none; }
+.find-marks mark { border-radius: 2px; background: var(--find-tint); color: transparent; }
+.find-marks mark.current { background: var(--find-current); }
+.source.finding { position: relative; z-index: 1; background: transparent; }
+
+/* Comments' words in the Markdown text: a copy of the text behind it,
+   invisible and set the same way, scrolled with it (as the line numbers are),
+   with the comments' words marked as in the formatted view. */
+.split > .source-marks { grid-row: 1; grid-column: 1; }
+.source-marks {
+  position: relative;
+  overflow: hidden;
+  container-type: size;
+  background: var(--page);
+  pointer-events: none;
+  zoom: var(--page-zoom, 1);
+}
+.source-marks[hidden] { display: none; }
+.source-marks-lines {
+  padding: 32px 32px 32px var(--source-left);
+  border-right: 1px solid transparent;
+  color: transparent;
+  font: 14px/1.6 var(--mono);
+  tab-size: 4;
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+  animation: line-gutter-scroll linear both;
+  animation-timeline: --source-scroll;
+}
+/* An empty line holds an invisible letter, so it's exactly as tall as a line of
+   the text (a minimum height of a line rounds differently, and adds up). */
+.source-marks-lines > div:empty::after { content: "\200b"; }
+.source-marks mark { border-radius: 2px; background: var(--comment-mark); color: transparent; }
+.source-marks mark.active { background: var(--comment-mark-active); box-shadow: inset 0 -2px 0 var(--coral-line); }
+.source-marks mark.change { background: var(--change-mark); box-shadow: inset 0 -2px 0 var(--change-mark-line); }
+.source.marked { position: relative; z-index: 1; background: transparent; }
+/* With Find open too, its matches sit over the comments' marks, which show through. */
+.source-marks:not([hidden]) ~ .find-marks { background: transparent; }
+
+/* Line numbers in the Markdown view: a copy of the text on a layer over it,
+   invisible and wrapped the same way, numbering each line in the left margin.
+   The text's scrolling moves the layer, with no delay. */
+.split { timeline-scope: --source-scroll; }
+.source { scroll-timeline: --source-scroll block; }
+.split > .line-gutter { grid-row: 1; grid-column: 1; }
+.line-gutter {
+  position: relative;
+  z-index: 2;
+  overflow: hidden;
+  container-type: size;
+  pointer-events: none;
+  zoom: var(--page-zoom, 1);
+}
+.line-gutter[hidden] { display: none; }
+.line-mirror {
+  padding: 32px 32px 32px var(--source-left);
+  border-right: 1px solid transparent;
+  font: 14px/1.6 var(--mono);
+  tab-size: 4;
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+  visibility: hidden;
+  counter-reset: file-line;
+  animation: line-gutter-scroll linear both;
+  animation-timeline: --source-scroll;
+}
+@keyframes line-gutter-scroll { to { transform: translateY(calc(100cqh - 100%)); } }
+.line-mirror > div { position: relative; counter-increment: file-line; }
+.line-mirror > div:empty::after { content: "\200b"; }
+.line-mirror > div::before {
+  position: absolute;
+  right: calc(100% + 16px);
+  visibility: visible;
+  content: counter(file-line) / "";
+  color: var(--line-number);
+  font: 400 11px var(--ui);
+  font-variant-numeric: tabular-nums;
+  line-height: 1lh;
+}
+/* The text and the preview move together (scroll-together.ts): a copy of the
+   text, never seen and set exactly like it, says where each of its lines is.
+   Kept apart, so laying it out never touches the rest of the window. (Leaving
+   it unlaid-out until asked, with content-visibility, made each scroll a
+   couple of milliseconds slower on a long document.) */
+.split > .together-rows { grid-row: 1; grid-column: 1; }
+.together-rows {
+  position: relative;
+  overflow: hidden;
+  contain: strict;
+  visibility: hidden;
+  pointer-events: none;
+  zoom: var(--page-zoom, 1);
+}
+.together-rows-text {
+  padding: 32px 32px 32px var(--source-left);
+  border-right: 1px solid transparent;
+  font: 14px/1.6 var(--mono);
+  tab-size: 4;
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+}
+.together-rows-text > div:empty::after { content: "\200b"; }
+/* What's in sight in the preview is kept in place by lining it up with the
+   text again, so the window's own way of keeping it (which would read as the
+   person scrolling the preview) is off here. */
+.split > .preview-pane { overflow-anchor: none; }
+
+/* A line that carries on the file line before it (an old Mac line ending) has no number. */
+.line-mirror > .cont { counter-increment: none; }
+.line-mirror > .cont::before { content: none; }
+.line-gutter.wide .line-mirror > div::before { right: calc(100% + 12px); }
+
+/* A narrow page (a narrow window, or one with a panel open) keeps more of its width for words. */
+@container (max-width: 680px) {
+  .page { padding: 48px 40px; }
+}
+@container (max-width: 480px) {
+  .page { padding: 32px 24px; }
+}
+
+/* Side panels: comments and history, to the right of the page ------------------------- */
+
+.comments-panel, .history-panel {
+  flex: none;
+  width: var(--side-width, 304px); /* set by columns.ts, within limits that follow the window */
+  border-left: 1px solid var(--chrome-line);
+  background: var(--side);
+  font: var(--text-13);
+}
+/* In the Markdown view, the panel gives way first in a narrow window, so the
+   text and its preview keep their room (columns.ts). */
+.doc.markdown-view > .doc-body > :is(.comments-panel, .history-panel) { width: var(--side-width-markdown, var(--side-width, 304px)); }
+/* Their left edge can be dragged; the line is there only while one of them is
+   (the comments' line is hidden with its panel, by comments-panel.ts). History
+   takes the comments' place while it's open, and while a version is shown. */
+.doc-body:not(:has(> .history-panel:not([hidden]))) > .side-handle:not(.comments-handle) { display: none; }
+.doc.history-open .comments-handle,
+.doc.viewing-version:not(.viewing-changes) .comments-handle,
+.doc.viewing-version:not(.viewing-changes) .comments-panel { display: none; }
+/* Each starts with a heading row level with the top of the page. */
+.panel-head { display: flex; align-items: center; justify-content: space-between; gap: var(--space-8); min-height: 28px; }
+.panel-head h2 { margin: 0; color: var(--ink); font: 600 var(--text-13); }
+
+/* The comments scroll on their own, beside the page: the heading, New comment and Send,
+   then the cards one under another (comments-panel.ts orders them). */
+.comments-panel { position: relative; min-height: 0; overflow-y: auto; padding: 0 var(--space-16) var(--space-48); }
+/* The heading, New comment and Send, and the panel's short messages stay in sight while the cards
+   scroll under them (roadmap Batch 11, F-2), across the panel's whole width, with a line under them
+   once cards are underneath (comments-panel.ts). */
+.comments-top {
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  display: flow-root;
+  margin: 0 calc(-1 * var(--space-16));
+  padding: var(--space-24) var(--space-16) 0;
+  background: var(--side);
+}
+.comments-top.over-cards { box-shadow: 0 1px 0 var(--chrome-line); }
+/* The side panels' headings stay level with the top of the page under the lines and banners over it
+   too: their height is --page-top, kept by columns.ts (roadmap Batch 11, F-12). */
+.comments-top::before { content: ""; display: block; height: var(--page-top, 0px); }
+/* With a mouse connected, the Mac's scroll bars take room. That room is always
+   kept in the comments and History lists, as beside the page, so cards and
+   rows don't narrow and rewrap (even mid-typing) once there are enough to scroll. */
+.comments-panel, .history-list { scrollbar-gutter: stable; }
+.comments-panel[hidden] { display: none; }
+.comments-top > .panel-head { margin-bottom: var(--space-12); }
+/* Under the heading, always: New comment on the left, a quiet button, and Send
+   to Claude (or Copy for Claude) on the right while an agent waits, the main
+   one (roadmap Batch 9, item 14). Both are one height, so the cards don't move
+   as Send comes and goes. A long agent name that leaves no room for both puts
+   Send on its own line under New comment. */
+.comments-hand-back-row { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-8); margin: -4px 0 var(--space-12); }
+.comments-new { flex: none; white-space: nowrap; }
+.comments-hand-back { margin-left: auto; white-space: nowrap; }
+/* In the narrowest panel with a mouse connected (the Mac's scroll bar takes 15 px of it), the two
+   buttons are a little less padded, so Copy for Claude stays beside New comment, 8 px apart. */
+.comments-top { container: comments-top / inline-size; }
+@container comments-top (max-width: 232px) {
+  .comments-hand-back-row > .comment-button { padding-inline: 4px; }
+}
+/* One filled button at a time (roadmap Batch 11, F-20): while a comment, a reply or an edit is being written
+   in the panel, its own button (Post, Reply, Save) is the main one, and Send steps back to a plain button. */
+.comments-panel:has(.comment-reply.writing, .comment-card.draft, .comment-edit) .comments-hand-back:not(:disabled) {
+  border-color: var(--control-line);
+  background: var(--button);
+  color: var(--ink);
+}
+.comments-panel:has(.comment-reply.writing, .comment-card.draft, .comment-edit) .comments-hand-back:hover:not(:disabled) { background: var(--hover); }
+/* In a wide panel the cards and the top row keep a readable width, at the panel's left beside the page, so
+   Send stays near New comment and each card's tick near its words (roadmap Batch 11, F-22). */
+.comments-top > *, .comments-list, .comments-empty, .comments-help { max-width: 480px; }
+/* Under it, while Send is greyed out with the agent waiting: why, and what to do (roadmap Batch 11, F-7). */
+.comments-hand-back-hint { margin: -4px 0 var(--space-12); color: var(--ink-soft); font: var(--text-12); text-wrap: balance; }
+.comments-hand-back-hint[hidden] { display: none; }
+/* Under it, why a Send didn't reach the agent, until Copy for Claude is pressed. */
+.comments-hand-back-why { margin: -4px 0 var(--space-12); padding: var(--space-8) var(--space-12); border-radius: 6px; background: var(--accent-tint); color: var(--ink); font: var(--text-12); }
+.comments-hand-back-why[hidden] { display: none; }
+.comments-list { display: flex; flex-direction: column; gap: var(--space-8); }
+.comments-empty { margin: 0 0 var(--space-8); color: var(--ink-soft); font: var(--text-13); }
+/* A short message, for a few seconds (only Markdown's marks were selected, say). */
+/* In the panel's top, so in sight wherever the panel is scrolled (comments-panel.ts keeps the cards still). */
+.comments-note { margin: 0 0 var(--space-12);padding: var(--space-8) var(--space-12); border-radius: 6px; background: var(--accent-tint); color: var(--ink); font: var(--text-12); }
+.comments-note[hidden] { display: none; }
+.comments-empty[hidden], .comments-resolved[hidden], .comments-help[hidden] { display: none; }
+.comments-help { display: block; padding: 0; }
+/* In the heading: "3 resolved · Show", in the panel's small text and link buttons. */
+.comments-resolved { display: inline-flex; align-items: baseline; gap: var(--space-4); color: var(--ink-soft); font: var(--text-12); white-space: nowrap; }
+.comments-resolved-count::after { content: "·"; margin-left: var(--space-4); }
+.comments-resolved .link-button { padding: 0; }
+/* Room kept under the cards while a card that went away would pull the ones above it down. */
+.comments-slack { pointer-events: none; }
+
+.comment-card {
+  position: relative;
+  padding: var(--space-12);
+  border: 1px solid var(--card-line);
+  border-radius: 8px;
+  background: var(--page);
+}
+/* The card in focus stands out at a glance (Orlando, 2026-11-12, roadmap Batch 9,
+   item 6: "I don't think we visually do a good enough job of distinguishing which
+   comment you have selected"): a blue-grey wash over the whole card and a thick
+   blue-grey bar down its left edge, a shape as well as a colour, with its label
+   lit: the quote in the coral its words have on the page, "Whole document" and
+   the other cards' labels in blue-grey. Nothing on it moves or changes size: the
+   bar is drawn over the card's own padding and the edge stays 1 pixel wide. It
+   isn't a ring all round, so it isn't mistaken for the keyboard's focus ring. */
+.comment-card.active { border-color: var(--accent); background: var(--card-focus); box-shadow: inset 3px 0 0 var(--accent); }
+.comment-card.active:not(.resolved, .detached) .comment-quote {
+  background: var(--comment-mark-active);
+  color: var(--ink);
+}
+.comment-card.active .comment-whole { background: var(--accent-line); color: var(--ink); }
+/* A resolved card, shown: quieter, with a dashed edge, no fill, and its words in the soft ink. */
+.comment-card.resolved { border-style: dashed; background: transparent; }
+.comment-card.resolved .comment-body, .comment-card.resolved .comment-author { color: var(--ink-soft); }
+.comment-card.resolved.active { border-style: solid; background: var(--card-focus); }
+/* Something new from an agent, not yet read: a dot in the agent's colour in the card's top left
+   corner, inside it and round with the corner (roadmap Batch 11, F-5; it was on the edge, half
+   outside), until the card has been in focus (roadmap Batch 1, item 2). Its colour is set on it,
+   its edge as on the tab. */
+.card-new {
+  position: absolute;
+  /* In the padding beside the label's line, clear of the label and of the card's edge (Batch 24, N-18:
+     in the corner it sat on the edge and touched the label). */
+  left: 2px;
+  top: calc(var(--space-12) + (var(--line-13) - 8px) / 2);
+  width: 8px;
+  height: 8px;
+  box-sizing: border-box;
+  border: 2px solid var(--dot-edge, var(--agent-ink));
+  border-radius: 50%;
+  background: var(--ink-soft);
+  pointer-events: none;
+}
+.card-new[hidden] { display: none; }
+/* The keyboard rests on the card (Next Comment): the focus ring says typing goes to its reply, not the page.
+   Only the keyboard puts it there (a click doesn't), and Option and Command keep browsers from showing it by themselves. */
+.comment-card:focus { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.comment-head { display: flex; align-items: flex-start; gap: var(--space-8); margin-bottom: var(--space-8); }
+/* The top right corner: the first comment's "⋯", then Resolve (Done, Reopen) in the very corner,
+   on the line of the quoted words, which narrow to make room (roadmap Batch 9, item 2). As tall as
+   that line: its 24-pixel buttons reach past it evenly above and below, so the line keeps its height. */
+.comment-corner { flex: none; display: flex; align-items: center; gap: var(--space-4); height: var(--line-13); margin: 0 -4px 0 auto; }
+.comment-corner:empty { display: none; }
+.comment-quote {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  padding-left: var(--space-8);
+  border-left: 2px solid var(--coral-line);
+  border-radius: 0 4px 4px 0;
+  color: var(--ink-soft);
+  font: italic 13px/var(--line-13) var(--serif);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+}
+/* The card in focus, or one being replied to or edited, quotes its words in full;
+   the others keep to two lines, so the panel is easy to scan. */
+.comment-card.active .comment-quote,
+.comment-card:has(.comment-reply.writing) .comment-quote,
+.comment-card:has(.comment-edit) .comment-quote { display: block; -webkit-line-clamp: none; }
+.comment-card.detached .comment-quote { border-left-style: dashed; }
+.comment-whole {
+  flex: none;
+  align-self: center;
+  margin-right: auto;
+  padding: 0 var(--space-8);
+  border-radius: 4px;
+  background: var(--chip);
+  color: var(--ink-soft);
+  font: 600 var(--text-11);
+}
+.comment-note { margin: 0 0 var(--space-8); color: var(--ink-soft); font: italic var(--text-12); }
+
+.comment-messages { list-style: none; margin: 0; padding: 0; }
+.comment-message + .comment-message { margin-top: var(--space-12); padding-top: var(--space-12); border-top: 1px solid var(--divider); }
+.comment-byline { display: flex; align-items: center; gap: var(--space-8); height: 20px; }
+.comment-avatar {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  color: var(--agent-ink);
+  font: 600 var(--text-11);
+}
+.comment-avatar.person { background: var(--accent); color: var(--on-accent); }
+.comment-author { overflow: hidden; color: var(--ink); font: 600 var(--text-12); text-overflow: ellipsis; white-space: nowrap; }
+/* A long name in "To ..." is cut short before "You" is, so the name line keeps
+   who wrote it, the time and the "⋯" (all of it in the tooltip). */
+.comment-recipient { flex: 0 1000 auto; min-width: 0; overflow: hidden; color: var(--ink-soft); font: var(--text-11); text-overflow: ellipsis; white-space: nowrap; }
+/* The time goes just after the name, so the "⋯" has the line's end to itself. */
+.comment-time { flex: none; color: var(--ink-soft); font: var(--text-11); white-space: nowrap; }
+/* A message's words start at the card's left edge, in line with the person icon:
+   only the name line has the icon beside it (Orlando, 2026-11-12, roadmap Batch 9,
+   item 1: "can we left align all of the comments?"). The same for what's under
+   the words: Edited, an agent's options, an edit box, the reply box. */
+.comment-body { margin: var(--space-4) 0 0; color: var(--ink); font: var(--text-13); white-space: pre-wrap; overflow-wrap: anywhere; }
+/* On a card not in focus each message keeps to four lines, ending in an
+   ellipsis, so a long one doesn't make the list hard to scan (Orlando, as
+   quotes keep to two). The card in focus, and one being replied to or edited,
+   shows every word; a message being written or edited is a box, never cut. */
+.comment-card:not(.active):not(:has(.comment-reply.writing, .comment-edit)) .comment-body {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 4;
+  overflow: hidden;
+}
+.comment-edited { display: block; margin: var(--space-4) 0 0; color: var(--ink-soft); font: var(--text-11); }
+/* An agent's options on its reply (roadmap Batch 3, item 2): what the person
+   chose, and a button for each other option, under the reply's words. */
+.comment-options { margin: var(--space-8) 0 0; }
+.comment-option-buttons { display: flex; flex-wrap: wrap; gap: var(--space-8); }
+.comment-option { max-width: 100%; height: var(--control-small); padding: 0 var(--space-12); border-radius: 12px; font: 500 var(--text-12); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.comment-option.stale { border-style: dashed; color: var(--ink-soft); }
+.comment-option-chosen { margin: 0 0 var(--space-8); color: var(--ink-soft); font: var(--text-12); }
+.comment-option-why { margin: var(--space-8) 0 0; color: var(--warning-ink); font: var(--text-12); }
+/* Edit and Delete for each of the person's messages: a quiet "⋯", in the
+   card's top right corner for the first comment and at the end of the name
+   line for a reply, opening a short menu (Orlando: words under each message
+   were easy to miss and added to the text). Always there on the card in
+   focus; on the others while the pointer is over the card or the keyboard is
+   on it, its room kept so nothing moves. Out of sight it's drawn in no
+   colour, so the keyboard can still reach it. */
+.comment-more {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: var(--control-small);
+  margin: 0 -4px 0 auto; /* on a reply's 20-pixel name line, reaching past it evenly above and below */
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--ink-soft);
+}
+.comment-more:hover:not(:disabled), .comment-more[aria-expanded="true"] { background: var(--hover); color: var(--ink); }
+.comment-corner .comment-more { margin: 0; }
+.comment-card:not(.active):not(:hover) .comment-more:not(:focus-visible):not([aria-expanded="true"]) { color: transparent; }
+/* Cards stay compact until one is in focus: then it offers Reply. */
+.comment-card:not(.active) .comment-reply:not(.writing) { display: none; }
+.comment-edit { margin: var(--space-8) 0 0; }
+
+/* As tall as its words, whatever redraws it or narrows it: never a line cut. */
+textarea.comment-input {
+  display: block;
+  width: 100%;
+  height: auto;
+  field-sizing: content;
+  min-height: var(--control);
+  padding: var(--space-4) var(--space-8);
+  font: var(--text-13);
+  resize: none;
+  overflow: hidden;
+}
+.draft .comment-input { min-height: 52px; }
+.comment-actions-row { display: flex; align-items: center; gap: var(--space-8); margin-top: var(--space-8); }
+.comment-spacer { flex: 1; }
+.comment-button { height: var(--control-small); padding: 0 var(--space-8); }
+/* Resolve on every open comment, Done on a note, Reopen
+   on a resolved one: a small square with only a tick, in the card's top right
+   corner (Orlando, 2026-11-12, roadmap Batch 9, item 2). Reopen's tick is
+   filled in, as the comment is done: pressing it opens it again. */
+.comment-close { display: inline-flex; flex: none; align-items: center; justify-content: center; width: 24px; height: var(--control-small); padding: 0; }
+.comment-close svg { width: 14px; height: 14px; color: var(--accent-ink); }
+.comment-close:hover:not(:disabled) { border-color: var(--accent); color: var(--accent-ink); }
+.comment-close.comment-reopen { border-color: var(--accent); background: var(--accent); }
+.comment-close.comment-reopen svg { color: var(--on-accent); }
+.comment-close.comment-reopen:hover:not(:disabled) { border-color: var(--accent-strong); background: var(--accent-strong); }
+.comment-reply { margin-top: var(--space-12); }
+.comment-reply[hidden] { display: none; }
+.comment-reply-actions { display: none; }
+.comment-reply.writing .comment-reply-actions { display: flex; }
+.comment-error { margin: var(--space-8) 0 0; color: var(--warning-ink); font: var(--text-12); }
+.comment-error[hidden] { display: none; }
+
+/* @ to tag an agent in a comment (mentions.ts). A tag is the agent's façade
+   colour behind its name. In a comment box, the words sit over a layer laid out
+   exactly like them, which shows only the tags' colour. */
+.mention-tag {
+  border-radius: 4px;
+  background: var(--tag);
+  box-shadow: -2px 0 0 var(--tag), 2px 0 0 var(--tag);
+  color: var(--agent-ink);
+}
+.mention-box { position: relative; border-radius: 6px; background: var(--page); }
+.mention-box > textarea.comment-input { position: relative; background: transparent; }
+.mention-layer {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  padding: var(--space-4) var(--space-8);
+  border: 1px solid transparent;
+  font: var(--text-13);
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+  visibility: hidden;
+  pointer-events: none;
+}
+.mention-layer .mention-tag { visibility: visible; }
+.mention-layer .mention-tag > span { visibility: hidden; }
+.mention-note { margin: var(--space-4) 0 0; color: var(--ink-soft); font: var(--text-12); }
+.mention-note[hidden] { display: none; }
+/* The list of agents that opens on @, just under it. */
+.mention-list {
+  position: fixed;
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+  min-width: 200px;
+  max-width: 280px;
+  max-height: 248px;
+  overflow-y: auto;
+  padding: var(--space-4);
+  border: 1px solid var(--chrome-line);
+  border-radius: 8px;
+  background: var(--float);
+  box-shadow: var(--menu-shadow);
+  font: var(--text-13);
+}
+.mention-list[hidden] { display: none; }
+.mention-group { padding: var(--space-4) var(--space-8); color: var(--ink-soft); font: 600 var(--text-11); }
+.mention-option { display: flex; flex: none; align-items: center; gap: var(--space-8); height: var(--control); padding: 0 var(--space-8); border-radius: 4px; color: var(--ink); }
+.mention-option:hover { background: var(--hover); }
+/* The agent the arrows have chosen: the card in focus's blue-grey bar at its left, one sign for "this one"
+   (roadmap Batch 12, G-5). */
+.mention-option[aria-selected="true"] { background: var(--float-hover); box-shadow: inset 3px 0 0 var(--accent); }
+/* How many agents the list holds, for a screen reader only. */
+.mention-count { position: absolute; font: var(--text-12); width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.mention-badge {
+  position: relative;
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--tag);
+  color: var(--agent-ink);
+  font: 600 var(--text-11);
+}
+/* Connected now: a dot on the badge in the agent's colour, as a chat app shows who's online. The
+   group headings ("Connected", "Not connected") say it in words. Not connected: quieter, still pickable. */
+.mention-dot {
+  position: absolute;
+  right: -4px;
+  bottom: -4px;
+  width: 11px;
+  height: 11px;
+  box-sizing: border-box;
+  border: 1.5px solid var(--agent-ink);
+  border-radius: 50%;
+  background: var(--tag);
+  box-shadow: 0 0 0 2px var(--float);
+}
+.mention-option:not(.connected) { color: var(--ink-soft); }
+.mention-option:not(.connected) .mention-badge { background: transparent; box-shadow: inset 0 0 0 1.5px var(--tag); color: var(--ink-soft); }
+.mention-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mention-default { flex: none; color: var(--ink-soft); font: var(--text-11); }
+.mention-empty { display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-4); padding: var(--space-8); color: var(--ink-soft); font: var(--text-12); }
+.mention-empty .link-button { padding: 0; font: 500 var(--text-12); }
+
+/* The History panel: a list of versions, newest first. */
+.history-panel { display: flex; flex-direction: column; min-height: 0; }
+.history-panel[hidden] { display: none; }
+.history-panel::before { content: ""; flex: none; height: var(--page-top, 0px); }
+.doc.history-open .comments-panel { display: none; }
+.history-header { flex: none; padding: var(--space-24) var(--space-16) 0; }
+.history-close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: var(--control);
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--ink-soft);
+}
+.history-close:hover:not(:disabled) { color: var(--ink); }
+.history-hint { flex: none; margin: var(--space-4) 0 0; padding: 0 var(--space-16) var(--space-8); color: var(--ink-soft); font: var(--text-12); }
+.history-list { flex: 1; min-height: 0; overflow-y: auto; list-style: none; margin: 0; padding: var(--space-4) var(--space-8) var(--space-16); }
+/* Rows sit 8 in from the panel, so their words line up with the heading at 16
+   (8, and the row's padding 8; their edges are drawn inside them). */
+.history-entry { margin: 0 0 var(--space-4); border-radius: 8px; }
+.history-item {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--space-4) var(--space-8);
+  width: 100%;
+  height: auto;
+  margin: 0;
+  padding: var(--space-8);
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--ink);
+  font: var(--text-13);
+  text-align: left;
+  white-space: normal;
+}
+.history-item:hover:not(:disabled) { background: var(--page); box-shadow: inset 0 0 0 1px var(--chrome-line); }
+/* The version shown is open in place, like a comment card in focus, with the
+   whole conversation behind it under its row. */
+.history-entry.open { background: var(--page); box-shadow: inset 0 0 0 2px var(--accent); }
+.history-entry.open > .history-item, .history-entry.open > .history-item:hover:not(:disabled) { background: transparent; box-shadow: none; }
+.history-who { grid-column: 1; overflow: hidden; font-weight: 600; text-overflow: ellipsis; white-space: nowrap; }
+.history-when { grid-column: 1; color: var(--ink-soft); font: var(--text-12); }
+.history-tag { grid-column: 2; grid-row: 1; align-self: center; padding: 0 var(--space-8); border-radius: 4px; background: var(--accent-tint); color: var(--accent-ink); font: 600 var(--text-11); }
+/* Compact in the list: two lines of each comment and reply, an ellipsis where there's more. */
+.history-addressed { grid-column: 1 / -1; display: flex; flex-direction: column; gap: var(--space-8); margin-top: var(--space-8); }
+.history-thread { display: flex; flex-direction: column; gap: var(--space-4); padding-left: var(--space-8); border-left: 2px solid var(--coral-line); font: var(--text-12); }
+.history-comment, .history-reply { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; }
+.history-comment { color: var(--ink); }
+.history-reply { color: var(--ink-soft); }
+/* Open: every word, wrapped, never cut; the list scrolls when it's long. */
+.history-detail { display: flex; flex-direction: column; gap: var(--space-16); padding: var(--space-4) var(--space-8) var(--space-12); cursor: auto; user-select: text; }
+.history-conversation { display: flex; flex-direction: column; gap: var(--space-8); padding-left: var(--space-8); border-left: 2px solid var(--coral-line); }
+.history-quote { margin: 0; color: var(--ink-soft); font: italic 13px/var(--line-13) var(--serif); white-space: pre-wrap; overflow-wrap: anywhere; }
+.history-whole, .history-label { align-self: flex-start; padding: 0 var(--space-8); border-radius: 4px; background: var(--chip); color: var(--ink-soft); font: 600 var(--text-11); }
+.history-messages { display: flex; flex-direction: column; gap: var(--space-8); list-style: none; margin: 0; padding: 0; }
+.history-byline { display: flex; align-items: baseline; gap: var(--space-8); min-width: 0; }
+.history-author { color: var(--ink); font: 600 var(--text-12); }
+.history-to { color: var(--ink-soft); font: var(--text-11); }
+.history-body { margin: var(--space-4) 0 0; color: var(--ink); font: var(--text-13); white-space: pre-wrap; overflow-wrap: anywhere; }
+.history-request { margin: 0; }
+
+/* Status bar --------------------------------------------------------------------------- */
+
+/* Each item has 8 pixels of room either side (and 4 between them), so the first one's words start at 24
+   like the other bars' and the quiet buttons light up round their words; its line on top is drawn inside its 28 pixels, so the
+   24-pixel buttons sit on whole pixels (roadmap Batch 11, F-11). */
+.status-bar {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  height: 28px;
+  padding: 0 var(--space-16);
+  background: var(--chrome);
+  box-shadow: inset 0 1px 0 var(--chrome-line);
+  color: var(--ink-soft);
+  font: var(--text-12);
+  white-space: nowrap;
+}
+.status-bar > :not(.status-spacer, .screen-reader-only) { padding: 0 var(--space-8); }
+#save-status { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+/* "Saved" and "Saving…" are never cut short ("Sa…"); a longer "Not saved: …" gives way with the rest. */
+#save-status:is([data-state="saved"], [data-state="pending"]) { flex-shrink: 0; }
+/* Words only screen readers hear: the not-saved line, told as it comes (app.ts). */
+.screen-reader-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+/* Whose turn it is, beside "Saved": quiet words like the rest of the bar,
+   with the agent's colour as a small dot while one is editing (app.ts). */
+#turn-status { display: inline-flex; align-items: center; gap: var(--space-8); min-width: 0; overflow: hidden; }
+#turn-status[hidden] { display: none; }
+.turn-dot { flex: none; box-sizing: border-box; width: 10px; height: 10px; border: 2px solid var(--dot-edge, var(--accent-ink)); border-radius: 50%; background: var(--muted); }
+.turn-dot[hidden] { display: none; }
+/* Short of room, the agent's words give way before the count: "Claude is waiting for yo… · 3 to read". */
+.turn-text { display: inline-flex; min-width: 0; overflow: hidden; }
+.turn-who { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.turn-read { flex: none; white-space: pre; }
+/* Shorter still, the section in sight goes, so whose turn it is stays whole (app.ts, fitTurn; roadmap Batch 24, row 27). */
+.status-bar.section-gives-way #outline-section { display: none; }
+/* Shorter yet, Copy path goes too; it is still in the File menu (review of Batch 24, R24-4). */
+.status-bar.path-gives-way #copy-path { display: none; }
+#save-status[data-state="conflict"],
+#save-status[data-state="missing"],
+#save-status[data-state="recovered"],
+#save-status[data-state="trashed"],
+#save-status[data-state="error"] { color: var(--warning-ink); font-weight: 600; }
+.status-spacer { flex: 1; }
+/* Quiet buttons: words that light up under the pointer. */
+.status-button {
+  flex: none;
+  height: var(--control-small);
+  border: none;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--ink-soft);
+  font: 500 var(--text-12);
+}
+.status-button[hidden] { display: none; }
+.status-button:hover:not(:disabled) { background: var(--panel); color: var(--ink); }
+.status-button[aria-pressed="true"], .status-button.done { color: var(--accent-ink); }
+.status-button:disabled { background: transparent; color: var(--muted); }
+
+/* The outline (View > Show Outline, outline.ts) ---------------------------------------- */
+
+/* The headings in a column at the left of the page, the one in sight marked
+   with the accent. Each row: the heading's words, a dot when others changed
+   the section since it was handed over, and its open comments' count. In
+   the formatted view only; dimmed and out of use while a version or Show
+   changes is shown. The width is outline.ts's PANE. Its button is the
+   toolbar's first, just above it. */
+.outline-pane {
+  flex: none;
+  width: 208px;
+  min-height: 0;
+  overflow-y: auto;
+  padding: var(--space-24) var(--space-8);
+  border-right: 1px solid var(--chrome-line);
+  background: var(--side);
+  color: var(--ink);
+  font: var(--text-13);
+}
+.outline-pane[hidden], .doc.markdown-view .outline-pane { display: none; }
+.doc.viewing-version .outline-pane { opacity: 0.5; }
+/* Its title is in the same line and style as the Comments and History headings (roadmap Batch 11, F-12). */
+.outline-pane::before { content: ""; display: block; height: var(--page-top, 0px); }
+.outline-title { display: flex; align-items: center; min-height: 28px; margin: 0 var(--space-8) var(--space-8); color: var(--ink); font: 600 var(--text-13); }
+/* Turned on where it can't show, the outline says why and what to do, at the page's top left for a moment
+   (outline.ts; roadmap Batch 11, F-19). */
+.outline-told {
+  position: fixed;
+  z-index: 10;
+  max-width: 320px;
+  margin: 0;
+  padding: var(--space-8) var(--space-12);
+  border: 1px solid var(--chrome-line);
+  border-radius: 8px;
+  background: var(--float);
+  box-shadow: var(--menu-shadow);
+  color: var(--ink);
+  font: var(--text-13);
+  text-wrap: balance;
+}
+.outline-list { margin: 0; padding: 0; list-style: none; }
+.outline-row { display: flex; align-items: center; gap: var(--space-4); border-radius: 4px; }
+.outline-row:hover { background: var(--hover); }
+.outline-go {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+  height: auto; /* a long heading's second line makes the row taller */
+  min-height: var(--control);
+  padding: var(--space-4) var(--space-4) var(--space-4) var(--space-8);
+  border: none;
+  border-radius: 4px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+}
+.outline-row[data-level="2"] .outline-go { padding-left: 20px; }
+.outline-row[data-level="3"] .outline-go { padding-left: var(--space-32); }
+.outline-row[data-level="1"] .outline-words { font-weight: 600; }
+/* A long heading takes a second line before it's cut short (the pane is narrow): "A shared help desk for the volunteer team", not "A shared help d…". */
+.outline-words { flex: 1; min-width: 0; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; overflow-wrap: anywhere; white-space: normal; }
+.outline-row.in-sight .outline-go { box-shadow: inset 2px 0 0 var(--accent); color: var(--accent-ink); }
+.outline-dot { flex: none; width: 8px; height: 8px; border-radius: 50%; background: var(--change-mark-line); }
+.outline-dot[hidden] { display: none; }
+/* In the comments' own colour, as their marks in the text. */
+.outline-count { flex: none; min-width: 16px; padding: 0 var(--space-4); border-radius: 8px; background: var(--comment-mark); color: var(--ink); font: var(--text-11); text-align: center; }
+.outline-count:empty { display: none; }
+.outline-empty { margin: 0 var(--space-8); color: var(--ink-soft); font: var(--text-12); }
+.outline-empty[hidden] { display: none; }
+/* In the status bar, the section in sight: the first words to give way when the bar is short of room, down
+   to about a dozen characters ("2.2 Always a…"), never to a cut "2" (roadmap Batch 11, F-23). A shorter
+   name keeps its own width. */
+#outline-section { flex: 0 1000 auto; min-width: calc-size(max-content, min(size, 88px)); overflow: hidden; text-overflow: ellipsis; }
+#outline-section[hidden] { display: none; }
+
+/* Menus and the link editor ------------------------------------------------------------ */
+
+.menu, .popover {
+  position: fixed;
+  z-index: 10;
+  border: 1px solid var(--chrome-line);
+  border-radius: 8px;
+  background: var(--float);
+  box-shadow: var(--menu-shadow);
+  font: var(--text-13);
+}
+/* In dark, a menu's edge stands out from what's behind it (roadmap Batch 24, row 29: W-17). */
+.menu { border-color: var(--float-edge); }
+/* Never wider than the window: a long name (All tabs) ends in "…" (review of Batch 12, B12-9). */
+.menu { display: flex; flex-direction: column; min-width: 192px; max-width: calc(100vw - 16px); padding: var(--space-4); overflow-y: auto; }
+/* A comment card's More actions: two short words. */
+.menu.menu-small { min-width: 128px; }
+.menu[hidden], .popover[hidden] { display: none; }
+.menu > * { flex: none; }
+/* More's items, like the Mac's menus: a tick, the button's icon, the words, the keys. */
+.menu-rich button { display: flex; flex: none; align-items: center; gap: var(--space-8); padding: 0 var(--space-8); }
+.menu-tick, .menu-icon { display: inline-flex; flex: none; align-items: center; justify-content: center; width: 16px; }
+.menu-icon b, .menu-icon i, .menu-icon s { font: 15px/1 var(--serif); }
+.menu-label { flex: 1; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.menu-key { margin-left: var(--space-16); color: var(--ink-soft); font-variant-numeric: tabular-nums; }
+.menu-sub { display: inline-flex; color: var(--ink-soft); }
+.menu-rich button:disabled .menu-key, .menu-rich button:disabled .menu-sub { color: var(--muted); }
+/* The item whose own menu is open beside it stays lit, as in the Mac's menus. */
+.menu button[aria-expanded="true"] { background: var(--float-hover); box-shadow: inset 3px 0 0 var(--accent); }
+.menu button {
+  height: var(--control);
+  padding: 0 var(--space-12);
+  border: none;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--ink);
+  font: var(--text-13);
+  text-align: left;
+}
+.menu button:hover:not(:disabled), .menu button:active:not(:disabled) { background: var(--float-hover); color: var(--ink); }
+.menu button:disabled { color: var(--muted); }
+.menu button:focus-visible { outline-offset: -2px; }
+.menu-separator { height: 1px; margin: var(--space-4) var(--space-8); background: var(--divider); }
+.popover { display: flex; flex-direction: column; gap: var(--space-12); width: 328px; padding: var(--space-16); }
+.field { display: flex; flex-direction: column; gap: var(--space-4); color: var(--ink-soft); font: 600 var(--text-12); }
+.field[hidden] { display: none; }
+.popover-actions { display: flex; justify-content: flex-end; gap: var(--space-8); }
+.popover-actions button[hidden] { display: none; }
+
+/* Dialogs: Connect your agents, Export settings ---------------------------------------- */
+
+.connect-agents, dialog.sheet {
+  max-width: calc(100vw - 32px);
+  padding: var(--space-24);
+  border: 1px solid var(--chrome-line);
+  border-radius: 12px;
+  background: var(--float);
+  color: var(--ink);
+  box-shadow: var(--menu-shadow);
+  font: var(--text-13);
+}
+.connect-agents::backdrop, dialog.sheet::backdrop { background: var(--backdrop); }
+.connect-agents { width: 480px; }
+dialog.sheet { width: 440px; margin: 72px auto auto; }
+.connect-title, .sheet h2 { margin: 0 0 var(--space-8); font: 600 var(--text-15); }
+.connect-intro, .sheet-note { margin: 0 0 var(--space-16); color: var(--ink-soft); font: var(--text-13); }
+
+.agent-list { list-style: none; margin: 0 0 var(--space-16); padding: 0; border-top: 1px solid var(--divider); }
+.agent-list[hidden] { display: none; }
+.agent-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-4) var(--space-16);
+  min-height: 56px;
+  padding: var(--space-8) 0;
+  border-bottom: 1px solid var(--divider);
+}
+.agent-name { display: flex; flex-direction: column; gap: var(--space-4); min-width: 0; }
+.agent-title { font-weight: 600; }
+.agent-detail { color: var(--ink-soft); font: var(--text-12); }
+.agent-state { display: flex; align-items: center; gap: var(--space-12); }
+.agent-connected { color: var(--accent-ink); font: 600 var(--text-12); }
+.agent-connected::before, .agent-note.connected::before { content: "\2713"; margin-right: var(--space-4); }
+/* Its settings written, but none of its sessions has reached Corillo yet: a status, in quiet words with an
+   open ring (Connected has its tick), so it isn't taken for a button (roadmap Batch 11, F-26). */
+.agent-set-up { display: inline-flex; align-items: center; gap: var(--space-4); color: var(--ink-soft); font: var(--text-12); }
+.agent-set-up::before { content: ""; box-sizing: border-box; width: 8px; height: 8px; border: 1.5px solid currentColor; border-radius: 50%; }
+.agent-note.connected { color: var(--accent-ink); font-weight: 600; }
+/* Copy, after the request to try: a small button in the line, edged like the rest. */
+.agent-try-copy { height: var(--control-small); margin-left: var(--space-4); padding: 0 var(--space-8); vertical-align: middle; }
+.agent-outdated { color: var(--warning-ink); font: var(--text-12); }
+.agent-note { grid-column: 1 / -1; margin: 0; color: var(--ink-soft); font: var(--text-12); }
+.agent-note.problem { color: var(--warning-ink); }
+.agent-missing { margin: 0 0 var(--space-16); color: var(--ink-soft); font: var(--text-12); }
+.agent-missing[hidden] { display: none; }
+.connect-move, .connect-problem { margin: 0 0 var(--space-16); color: var(--warning-ink); font: var(--text-13); }
+.connect-move[hidden], .connect-problem[hidden] { display: none; }
+.connect-actions { display: flex; align-items: center; gap: var(--space-8); margin-top: var(--space-24); }
+.connect-spacer { flex: 1; }
+.connect-browser { margin: 0; color: var(--ink-soft); font: var(--text-12); }
+/* With no document open, the box sits under the start screen's name and its
+   line on what Corillo is (P-5), where they are, so nothing moves when it
+   opens or closes (roadmap Batch 11, F-27); what's below the line waits
+   behind it. */
+.connect-agents.over-start { margin: var(--below-start, 160px) auto auto; max-height: calc(100vh - var(--below-start, 160px) - 16px); }
+.connect-agents.over-start::backdrop { background: transparent; }
+body.connect-over-start .empty-actions, body.connect-over-start .empty-connect, body.connect-over-start .recent { visibility: hidden; }
+/* In a window too short for the whole box under the name where it is, the name rises to the top first, as it
+   did before F-27 (connect-agents.ts; review of Batch 11, B11R-5). */
+body.connect-rise .empty { align-items: flex-start; }
+
+.sheet-group { margin: 0 0 var(--space-16); padding: 0; border: none; }
+.sheet-group legend, .sheet .advanced summary, .sheet-label { padding: 0; color: var(--ink); font: 600 var(--text-12); }
+.sheet-group legend { margin-bottom: var(--space-4); }
+.radio-row { display: flex; align-items: center; gap: var(--space-8); height: 28px; }
+.radio-row input { width: 16px; height: 16px; margin: 0; }
+.file-row { display: flex; align-items: center; gap: var(--space-8); min-height: 28px; }
+.sheet-group .file-row { margin-left: var(--space-24); } /* under the radio's words: its 16 pixels and the gap */
+.file-name { flex: 1; min-width: 0; overflow: hidden; font: var(--text-12); text-overflow: ellipsis; white-space: nowrap; }
+.file-name.none { color: var(--ink-soft); }
+.file-row button { height: var(--control-small); padding: 0 var(--space-8); }
+.file-row button[hidden] { display: none; }
+.sheet .advanced { margin: 0 0 var(--space-4); padding-top: var(--space-12); border-top: 1px solid var(--divider); }
+.sheet .advanced summary { cursor: default; }
+.sheet-field { margin: var(--space-12) 0 0; }
+.sheet-label { display: block; }
+.sheet-help { margin: var(--space-4) 0; color: var(--ink-soft); font: var(--text-12); }
+.sheet-actions { display: flex; justify-content: flex-end; gap: var(--space-8); margin-top: var(--space-24); }
+
+/* The notice after an export, above the status bar ---------------------------------------- */
+/* Corillo's own notices (file-notice.ts) look the same. They never lie over the words (roadmap Batch 11,
+   F-17): each is a bar the width of the window, in a band above the status bar that the page and its
+   panel end above. A tab's go at the foot of its tab, under the page and the panel; the window's under
+   them, just above the status bar (cornerOf). Stacked, they share their edges. Like the bars at the top
+   of the page, the words start at 24 (the dot first), the buttons follow the words, and the × is at the
+   right, 16 from the edge. */
+
+.corner-notices {
+  flex: none;
+  position: relative;
+  z-index: 3; /* over anything of the page's that reaches down */
+  display: flex;
+  flex-direction: column;
+}
+.export-notice, .file-notice {
+  /* The dot, the first line of words and the buttons share a row, centred on
+     each other; a detail goes on a second line under the words. The × keeps
+     to the right. */
+  display: grid;
+  grid-template-columns: auto minmax(0, max-content) repeat(3, auto) 1fr auto;
+  align-items: center;
+  align-content: center;
+  min-height: 44px;
+  padding: var(--space-8) var(--space-16) var(--space-8) var(--space-24);
+  border-top: 1px solid var(--accent-line);
+  background: var(--accent-tint);
+  color: var(--ink);
+  font: var(--text-13);
+}
+/* A dot says how it went: blue-grey done, coral not done, grey still working. */
+.export-notice-dot { grid-area: 1 / 1; width: 8px; height: 8px; margin-right: var(--space-12); border-radius: 50%; background: var(--accent); }
+.export-notice[data-state="failed"] .export-notice-dot { background: var(--coral-line); }
+.export-notice[data-state="working"] .export-notice-dot { background: var(--muted); }
+.export-notice[hidden], .file-notice[hidden] { display: none; }
+.export-notice-words { display: contents; }
+.export-notice-text { grid-area: 1 / 2; margin-right: var(--space-4); font-weight: 600; overflow-wrap: anywhere; }
+.export-notice[data-state="working"] .export-notice-text { color: var(--ink-soft); font-weight: 500; }
+.export-notice-detail { grid-area: 2 / 2 / 3 / -2; margin-top: var(--space-4); color: var(--ink-soft); font: var(--text-12); overflow-wrap: anywhere; }
+.export-notice-detail[hidden], .export-notice button[hidden] { display: none; }
+.export-notice button, .file-notice button { grid-row: 1; margin-left: var(--space-8); }
+.export-notice .export-notice-close, .file-notice .export-notice-close {
+  grid-column: -2;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: var(--control-small);
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--ink-soft);
+}
+
+/* Start screen, when no document is open ------------------------------------------------ */
+
+.empty { flex: 1; display: flex; align-items: safe center; justify-content: center; padding: var(--space-48) var(--space-16); background: var(--side); overflow-y: auto; }
+.empty[hidden] { display: none; }
+.empty-panel { width: 816px; max-width: 100%; text-align: center; }
+.empty-panel h1 { margin: 0 0 var(--space-8); font-size: 28px; font-weight: 600; }
+.empty-title { display: inline-flex; align-items: center; gap: var(--space-12); }
+/* The coquí mark beside the name. */
+.coqui-mark { flex: none; width: 34px; height: 32px; color: var(--accent); }
+.empty-panel > p { margin: 0 0 var(--space-24); color: var(--ink-soft); font: var(--text-15); }
+.empty-actions { display: flex; justify-content: center; gap: var(--space-8); }
+.empty-actions > button { height: var(--control-large); padding: 0 var(--space-16); font: 500 var(--text-13); }
+.empty-panel .empty-connect { display: flex; justify-content: center; margin: var(--space-16) 0 0; }
+.empty-connect .link-button { padding: 0 var(--space-12); font: 500 var(--text-13); }
+.empty-connect .link-button + .link-button { border-left: 1px solid var(--chrome-line); border-radius: 0; }
+
+/* Recent documents, as cards: a preview of the top of each document (its page
+   drawn at a quarter of its size, in the same colours as the page, light or
+   dark), then its name, folder and when it last changed. Two to four a row as
+   the window allows (one in a very narrow one), centred under the buttons.
+   Cards are part of the surface, like the page, so they cast no shadow: the
+   pointer gives them the blue-grey line, the keyboard the focus ring. */
+.recent { --fit: 4; --card: 192px; width: calc(min(var(--fit), var(--count, 1)) * (var(--card) + 16px) - 16px); max-width: 100%; margin: var(--space-48) auto 0; text-align: left; }
+.recent:empty { display: none; }
+@media (max-width: 847px) { .recent { --fit: 3; } }
+@media (max-width: 639px) { .recent { --fit: 2; } }
+@media (max-width: 431px) { .recent { --fit: 1; } }
+.recent-head { display: flex; align-items: center; justify-content: space-between; gap: var(--space-16); margin: 0 0 var(--space-8); }
+.recent-head h2 { margin: 0; color: var(--ink-soft); font: 600 var(--text-12); }
+.recent-head .link-button { padding: 0; }
+.recent-grid { display: grid; grid-template-columns: repeat(auto-fill, var(--card)); gap: var(--space-16); list-style: none; margin: 0; padding: 0; }
+.recent-item { display: flex; }
+.recent-card {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: auto;
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid var(--control-line);
+  border-radius: 8px;
+  background: var(--page);
+  color: var(--ink);
+  font: var(--text-13);
+  text-align: left;
+  white-space: normal;
+}
+button.recent-card:hover:not(:disabled) { border-color: var(--hover-line); background: var(--page); box-shadow: 0 0 0 1px var(--hover-line); }
+button.recent-card:active:not(:disabled) { border-color: var(--accent); background: var(--page); }
+.recent-preview { display: block; flex: none; height: 160px; overflow: hidden; border-bottom: 1px solid var(--divider); background: var(--page); pointer-events: none; }
+.recent-name { display: block; padding: var(--space-8) var(--space-12) 0; overflow: hidden; font-weight: 600; text-overflow: ellipsis; white-space: nowrap; }
+.recent-meta { display: flex; gap: var(--space-8); margin-top: auto; padding: var(--space-4) var(--space-12) var(--space-8); color: var(--ink-soft); font: var(--text-12); white-space: nowrap; }
+.recent-folder { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.recent-when { flex: none; }
+/* A document that's gone: a plain card saying so, with a way to take it off the list. */
+.recent-card.gone .recent-preview {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-4);
+  padding: var(--space-16);
+  background: var(--panel);
+  text-align: center;
+  pointer-events: auto;
+}
+.recent-gone { color: var(--ink); font-weight: 600; }
+.recent-gone-hint { margin-bottom: var(--space-4); color: var(--ink-soft); font: var(--text-12); }
+.recent-card.gone .link-button { padding: 0; }
+/* Where a document stands (roadmap Batch 4, item 3): one line under its name; what waits for the person in the accent. */
+/* Where it stands, the reason to look at the card: on two lines if need be ("3 comments and other changes waiting for you"), never cut before "waiting for you". */
+.recent-state { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; padding: 0 var(--space-12); overflow: hidden; color: var(--ink-soft); font: var(--text-12); overflow-wrap: anywhere; }
+.recent-state.waiting { color: var(--accent-ink); font-weight: 600; }
+.recent-gone-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: var(--space-4) var(--space-16); }
+
+/* The page in a preview: a 760-pixel page at a quarter of its size, set as the
+   page above sets the document (kept in step with those rules). */
+.recent-page {
+  display: block;
+  width: 760px;
+  padding: 48px 64px;
+  zoom: 0.25;
+  color: var(--ink);
+  font: 17px/1.6 var(--serif);
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+}
+.recent-page > :first-child { margin-top: 0; }
+.recent-page :is(h1, h2, h3, h4, h5, h6) { margin: 1.4em 0 0.5em; line-height: 1.25; color: var(--accent-ink); }
+.recent-page h1 { font-size: 1.64em; }
+.recent-page h2 { font-size: 1.27em; }
+.recent-page h3 { font-size: 1.09em; }
+.recent-page h4 { font-size: 1em; }
+.recent-page h5 { font-size: 1em; font-style: italic; }
+.recent-page h6 { font-size: 0.91em; }
+.recent-page p { margin: 0 0 0.9em; }
+.recent-page :is(ul, ol) { margin: 0 0 0.9em; padding-left: 1.6em; }
+/* Bullets are small dots of Corillo's own (start-screen.ts): a list's own marks
+   don't get smaller with the preview, and inside the card's list they'd be rings. */
+.recent-page ul > li { position: relative; }
+.recent-page ul > li:not(.task) { list-style: none; }
+.recent-page .preview-bullet { position: absolute; left: -0.95em; top: 0.65em; width: 0.3em; height: 0.3em; border-radius: 50%; background: var(--ink-soft); }
+.recent-page li > p { margin: 0.15em 0; }
+.recent-page li::marker { color: var(--ink-soft); }
+.recent-page li.task { list-style-type: "\2610\2002"; }
+.recent-page li.task[data-checked="true"] { list-style-type: "\2612\2002"; }
+.recent-page li.task::marker { font-family: var(--ui); }
+.recent-page blockquote { margin: 0 0 0.9em; padding-left: 1em; border-left: 3px solid var(--accent-line); }
+.recent-page .preview-link { color: var(--accent-ink); text-decoration: underline; }
+.recent-page code { padding: 0.1em 0.3em; border-radius: 4px; background: var(--raw); font-family: var(--mono); font-size: 0.88em; }
+.recent-page pre { margin: 0 0 0.9em; padding: 12px 16px; border-radius: 6px; background: var(--raw); font: 14px/1.5 var(--mono); white-space: pre-wrap; }
+.recent-page pre code { padding: 0; background: none; font-size: inherit; }
+.recent-page hr { margin: 1.6em 0; border: none; border-top: 1px solid var(--chrome-line); }
+.recent-page img { max-width: 100%; height: auto; }
+.recent-page table { margin: 0 0 1em; border-collapse: collapse; font-size: 0.91em; }
+.recent-page :is(th, td) { padding: 6px 10px; border-bottom: 1px solid var(--divider); vertical-align: top; }
+.recent-page tr:last-child > :is(th, td) { border-bottom-color: var(--chrome-line); }
+.recent-page th { border-bottom: 2px solid var(--chrome-line); font-weight: 600; text-align: left; }
+.recent-page .footnote-ref { color: var(--accent-ink); font-family: var(--ui); font-size: 0.7em; }
+/* A diagram, or a picture on the web, is a plain box in a preview. */
+.recent-page .preview-box { display: block; height: 160px; margin: 0 0 0.9em; border-radius: 6px; background: var(--raw); }
+
+/* Help window ---------------------------------------------------------------------------- */
+
+body.help { flex-direction: row; background: var(--page); }
+.help-nav {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  width: 224px;
+  padding: var(--space-24) var(--space-12);
+  overflow-y: auto;
+  background: var(--chrome);
+  border-right: 1px solid var(--chrome-line);
+}
+.help-brand { margin: 0 var(--space-8) var(--space-12); font: 600 var(--text-12); color: var(--ink-soft); }
+.help-search {
+  height: var(--control);
+  margin: 0 0 var(--space-12);
+  padding: 0 var(--space-8);
+  border: 1px solid var(--control-line);
+  border-radius: 6px;
+  background: var(--page);
+  color: var(--ink);
+  font: var(--text-13);
+}
+.help-pages, .help-results { display: flex; flex-direction: column; gap: 4px; }
+.help-pages[hidden], .help-results[hidden] { display: none; }
+.help-nav a { display: block; padding: var(--space-4) var(--space-8); border-radius: 6px; color: var(--ink); font: var(--text-13); text-decoration: none; }
+.help-nav a:hover { background: var(--panel); }
+/* The page shown: the card in focus's blue-grey bar at its left, as the chosen agent in the @ list (Batch 12, G-5). */
+.help-nav a[aria-current="page"] { background: var(--accent-tint); box-shadow: inset 3px 0 0 var(--accent); color: var(--accent-ink); font-weight: 600; }
+.help-result-title { display: block; }
+.help-result-page { display: block; font: var(--text-11); color: var(--ink-soft); }
+.help-no-results { margin: var(--space-4) var(--space-8); font: var(--text-12); color: var(--ink-soft); }
+.help-main { flex: 1; min-width: 0; overflow-y: auto; padding: 40px var(--space-48) var(--space-64); }
+/* A page reached by its address (#start, as Help opens) lands with the room above it, at the top, not 40
+   pixels down with its heading against the edge (roadmap Batch 11, F-29). */
+.help-page { max-width: 600px; font-size: 14px; line-height: 1.6; scroll-margin-top: 40px; }
+.help-page[hidden] { display: none; }
+.help-page h1 { margin: 0 0 8px; font-size: 24px; line-height: 1.25; }
+.help-page h2 { margin: 28px 0 4px; font-size: 15px; scroll-margin-top: 16px; }
+.help-page p, .help-page ol, .help-page ul { margin: 0 0 8px; }
+.help-page ol, .help-page ul { padding-left: 1.4em; }
+.help-page li { margin-bottom: 4px; }
+.help-page li > ul { margin: 4px 0 0; }
+.help-page a { color: var(--accent-ink); }
+.help-lead { color: var(--ink-soft); font: var(--text-15); }
+.help-next { margin-top: var(--space-24); }
+.help-page code { font: 12px var(--mono); background: var(--raw); padding: 2px 6px; border-radius: 4px; overflow-wrap: anywhere; }
+/* Pictures of Corillo, taken in light mode at twice their size, for sharp Retina screens. */
+.help-figure { margin: var(--space-12) 0; }
+.help-figure img { display: block; max-width: 100%; height: auto; border: 1px solid var(--chrome-line); border-radius: 6px; }
+.help-shortcuts { width: 100%; margin: var(--space-12) 0 var(--space-16); border-collapse: collapse; font: var(--text-13); }
+.help-shortcuts th { text-align: left; font: 600 var(--text-12); color: var(--ink-soft); padding: 6px var(--space-8); border-bottom: 1px solid var(--chrome-line); }
+.help-shortcuts td { padding: 6px var(--space-8); border-bottom: 1px solid var(--chrome-line); }
+/* Kept on one line where there's room; in Help at its narrowest, a long one wraps after a hyphen, so the table fits (last look of Batch 12, L-13). */
+.help-shortcuts kbd { font: var(--text-12); white-space: nowrap; }
+@media (max-width: 720px) { .help-shortcuts kbd { white-space: normal; } }
+/* Markdown at a glance: each example's Markdown beside how the page shows it.
+   The look is marked up the way the editor marks up the page, so the page's
+   own styles draw it; here it's only made a little smaller. */
+.md-example { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 8px; margin: 12px 0 8px; }
+.md-example.wide { grid-template-columns: minmax(0, 1fr); }
+.md-text, .help-page .md-look { min-width: 0; margin: 0; padding: 12px 16px; border-radius: 6px; }
+.md-text { background: var(--raw); color: var(--ink); font: 13px/1.5 var(--mono); white-space: pre-wrap; overflow-wrap: anywhere; }
+.help-page .md-look { border: 1px solid var(--chrome-line); font-size: 15px; white-space: normal; }
+.md-text::before, .md-look::before { display: block; margin-bottom: 4px; color: var(--ink-soft); font: 600 11px var(--ui); }
+.md-text::before { content: "Markdown"; }
+.md-look::before { content: "Formatted"; }
+.help-page .md-look > :last-child { margin-bottom: 0; }
+.help-page .md-look h1 { margin: 0 0 0.3em; font-size: 1.85em; }
+.help-page .md-look h2 { margin: 0.6em 0 0.3em; font-size: 1.35em; }
+.help-page .md-look h3 { margin: 0.6em 0 0; font-size: 1.15em; }
+.help-page .md-look :is(p, ul, ol) { margin: 0 0 0.6em; }
+.help-page .md-look ul, .help-page .md-look ol { padding-left: 1.6em; }
+.help-page .md-look li { margin: 0; }
+.help-page .md-look code { padding: 0.1em 0.3em; font: 0.88em var(--mono); }
+.help-page .md-look pre { margin: 0 0 0.6em; }
+.help-page .md-look pre code { padding: 0; font-size: inherit; background: none; }
+.help-page .md-look .footnote-def:first-of-type { margin-top: 0.6em; }
+.md-look .diagram img { display: block; max-width: 100%; height: auto; margin: 0 auto; }
+.md-how { color: var(--ink-soft); }
+.md-how kbd { font: inherit; white-space: nowrap; }
+.manual-tool { margin-top: var(--space-24); padding-top: var(--space-16); border-top: 1px solid var(--chrome-line); }
+.manual-tool h2 { margin-top: 0; }
+.manual-where { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-4) var(--space-8); }
+.manual-after { color: var(--ink-soft); font: var(--text-13); }
+.manual-move { color: var(--warning-ink); }
+.snippet { position: relative; margin: var(--space-8) 0; }
+.snippet-text {
+  margin: 0;
+  padding: 12px 80px 12px 14px;
+  background: var(--raw);
+  border: 1px solid var(--chrome-line);
+  border-radius: 8px;
+  font: 12px/1.5 var(--mono);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.snippet > .snippet-copy { position: absolute; top: 8px; right: 8px; }
+.snippet-copy { height: var(--control-small); padding: 0 var(--space-8); font: 500 var(--text-11); }
+.snippet-copy.done { background: var(--accent-tint); }
+
+/* Tables, finding your place ------------------------------------------------------------ */
+
+/* A table wider than the page scrolls sideways instead of running off it.
+   Its cells are drawn with it (isolation): otherwise each cell, being placed
+   for its own highlights, is drawn on its own, and the page's text after the
+   table on one big piece over them, which made every frame of typing near a
+   table cost a few milliseconds more. */
+.doc .ProseMirror table { display: block; max-width: 100%; overflow-x: auto; isolation: isolate; }
+
+/* In a table written as Markdown text, the cell the cursor is in gets a light
+   highlight and its row a fainter one: in the formatted view, and in the
+   Markdown view (drawn on a layer behind the text, like Find's matches). */
+.md-table-row { background: var(--accent-tint); }
+.md-table-cell { border-radius: 2px; background: var(--accent-line); }
+.split { position: relative; background: var(--page); }
+.cell-marks {
+  position: absolute;
+  z-index: 1;
+  overflow: hidden;
+  color: transparent;
+  pointer-events: none;
+}
+.cell-marks[hidden] { display: none; }
+.cell-marks-text { zoom: var(--page-zoom, 1); }
+.source.cell-lit { position: relative; z-index: 2; background: transparent; }
+
+/* Obsidian's syntax (obsidian.ts). In the editor its marks ([[ ]], ==, [!note])
+   stay, quieter than the words but still readable; in the preview and exports
+   (ob-reading) they're hidden, with comments and block ids. */
+.ProseMirror .ob-syntax { color: var(--ink-soft); text-decoration: none; }
+.ProseMirror .ob-link,
+.ProseMirror .ob-embed {
+  color: var(--accent-ink);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.15em;
+}
+.ProseMirror .ob-link.ob-syntax,
+.ProseMirror .ob-embed.ob-syntax { color: var(--ink-soft); text-decoration: none; }
+.ProseMirror .ob-picture { text-decoration: none; }
+.ProseMirror .ob-missing { color: var(--warning-ink); text-decoration: underline dashed; }
+.ProseMirror .ob-embed-picture { display: block; max-width: 100%; height: auto; margin: 8px 0; }
+.ProseMirror .ob-highlight { border-radius: 2px; background: var(--highlight-mark); }
+.ProseMirror .ob-highlight.ob-syntax { background: none; }
+/* A tag is ordinary words in Word, so it reads as ordinary words here too. */
+.ProseMirror .ob-tag { color: inherit; }
+.ProseMirror .ob-comment,
+.ProseMirror .ob-blockid { color: var(--ink-soft); font-size: 0.88em; }
+.ProseMirror.ob-reading .ob-syntax,
+.ProseMirror.ob-reading .ob-comment,
+.ProseMirror.ob-reading .ob-blockid,
+.ProseMirror.ob-reading .ob-hide,
+.ProseMirror.ob-reading :not(.ProseMirror) > pre.raw-block:is([data-kind="comment"], [data-kind="links"]) { display: none; }
+/* A comment or link definitions left out between two blocks takes the blank
+   line after it with it, as in Word (export-prep.ts): one line apart stays one. */
+.ProseMirror.ob-reading > pre.raw-block:is([data-kind="comment"], [data-kind="links"]) { height: 0; padding: 0; border: none; overflow: hidden; visibility: hidden; }
+.ProseMirror.ob-reading > pre.raw-block:is([data-kind="comment"], [data-kind="links"]) + * { margin-top: 0; }
+
+/* Callouts: a soft coloured box, its first line the title (on the page, and in start-screen previews). */
+:is(.ProseMirror, .recent-page) blockquote.ob-callout {
+  padding: 12px 16px;
+  border-left: 3px solid var(--callout-line);
+  border-radius: 6px;
+  background: var(--callout-tint);
+  color: var(--ink);
+}
+:is(.ProseMirror, .recent-page) blockquote.ob-callout > :last-child { margin-bottom: 0; }
+:is(.ProseMirror, .recent-page) blockquote.ob-callout > p:first-child { margin-top: 0; }
+:is(.ProseMirror, .recent-page) .ob-callout-sky { --callout-tint: var(--callout-sky); --callout-line: var(--agent-sky); }
+:is(.ProseMirror, .recent-page) .ob-callout-mint { --callout-tint: var(--callout-mint); --callout-line: var(--agent-mint); }
+:is(.ProseMirror, .recent-page) .ob-callout-ochre { --callout-tint: var(--callout-ochre); --callout-line: var(--agent-ochre); }
+:is(.ProseMirror, .recent-page) .ob-callout-rose { --callout-tint: var(--callout-rose); --callout-line: var(--agent-rose); }
+:is(.ProseMirror, .recent-page) .ob-callout-lilac { --callout-tint: var(--callout-lilac); --callout-line: var(--agent-lilac); }
+:is(.ProseMirror, .recent-page) .ob-callout-stone { --callout-tint: var(--raw); --callout-line: var(--chrome-line); }
+.ProseMirror .ob-callout-title { font-weight: 600; }
+.ProseMirror .ob-callout-marker { font-size: 0.8em; }
+.ProseMirror .ob-untitled::after { content: " " attr(data-title); color: var(--ink); font-size: 1.25em; font-weight: 600; }
+
+/* Comments (Obsidian's %% blocks and HTML's <!-- -->) and math blocks, kept as written. */
+.ProseMirror pre.raw-block[data-kind="comment"] { color: var(--ink-soft); }
+.ProseMirror pre.raw-block[data-kind="comment"]::before { content: "Comment, hidden in Word and Obsidian"; }
+.ProseMirror pre.raw-block[data-kind="math"]::before { content: "Math"; }
+
+/* Reviewing an agent's changes, comment by comment (change-marks.ts, review.ts) --------- */
+
+/* While its change shows, the comment in focus keeps only its coral underline,
+   so its words read as one place, with the change in clear blue on it (not
+   coral and blue patched together). */
+.ProseMirror.showing-change .comment-range.active { background: none; }
+/* The text an agent changed for the comment in focus, in its own colour. */
+.ProseMirror .change-mark,
+.ProseMirror .comment-range.change-mark,
+.ProseMirror .comment-range.active.change-mark,
+.ProseMirror .change-mark .comment-range,
+.ProseMirror .comment-range.active .change-mark { border-radius: 2px; background: var(--change-mark); box-shadow: inset 0 -2px 0 var(--change-mark-line); }
+/* What it said before, shown: the new words turn the green Show changes gives
+   added text, so the switch shows something even where the agent only added
+   words (Orlando, 2026-11-11: "I didn't see any difference in the words. It
+   added new content to the document."). */
+.ProseMirror .change-mark.change-after,
+.ProseMirror .comment-range.change-mark.change-after,
+.ProseMirror .comment-range.active.change-mark.change-after,
+.ProseMirror .change-mark.change-after .comment-range,
+.ProseMirror .comment-range.active .change-mark.change-after { background: var(--diff-added); box-shadow: inset 0 -2px 0 var(--diff-added-line); }
+/* What it said before: struck through, beside the new words, never part of the text. */
+.ProseMirror del.change-before { margin-right: 4px; padding: 0 2px; border-radius: 2px; background: var(--diff-removed-tint); color: var(--diff-removed); text-decoration: line-through; text-decoration-thickness: 1px; user-select: none; }
+/* Where words were only taken out. */
+.ProseMirror .change-gap { display: inline-block; width: 6px; height: 1.1em; margin: 0 1px; vertical-align: text-bottom; border-radius: 2px; background: var(--change-mark-line); }
+
+/* Where a comment's deleted text was: an empty line on screen only, never in the file. */
+.ProseMirror .comment-gap { display: inline-block; min-width: 24px; height: 1.2em; vertical-align: text-bottom; border: 1px dashed var(--coral-line); border-radius: 3px; background: var(--comment-mark); cursor: pointer; user-select: none; }
+.ProseMirror .comment-gap.line { display: block; width: 100%; height: auto; min-height: 1.7em; margin: 4px 0; }
+/* In an empty line of the document (the comment's whole paragraph deleted on
+   the page, the paragraph left), the box is drawn within that one line
+   (review R-EL-8), unless it's showing the words that were there. */
+.ProseMirror > p.empty-line:has(> .comment-gap.line) { position: relative; }
+.ProseMirror > p.empty-line > .comment-gap.line:not(:has(.change-before)) { position: absolute; inset: 2px 0; min-height: 0; margin: 0; }
+.ProseMirror .comment-gap.active { border-style: solid; background: var(--comment-mark-active); }
+.ProseMirror .comment-gap del.change-before { display: inline; margin: 0; background: none; }
+.ProseMirror .comment-gap.line del.change-before { display: block; padding: 2px 6px; }
+
+/* On a comment: the line about its change. */
+.comment-change { display: none; margin-top: var(--space-8); padding: var(--space-8) var(--space-8) var(--space-4); border-radius: 6px; background: var(--change-mark); box-shadow: inset 0 0 0 1px var(--change-box-line); color: var(--ink); font: var(--text-12); }
+.comment-card.active .comment-change { display: block; }
+.comment-change-swatch { display: inline-block; width: 10px; height: 10px; margin-right: var(--space-8); border-radius: 2px; background: var(--change-mark-line); vertical-align: -1px; }
+/* Without "Show what it said before", as much room below the words as above. */
+.comment-change:not(:has(> .link-button:not([hidden]))) { padding-bottom: var(--space-8); }
+.comment-change .link-button { display: block; padding: 0; color: var(--ink); text-decoration: underline; text-underline-offset: 2px; }
+.comment-change .link-button[hidden] { display: none; }
+.comment-card.gapped .comment-quote { text-decoration: line-through; text-decoration-thickness: 1px; }
+
+/* An agent's note about its pass (roadmap Batch 2, item 3): at the top, about 4 lines until it's in focus, as a comment's message. */
+.comment-card.pass-note { cursor: pointer; }
+.pass-note-text { margin: var(--space-4) 0 0; color: var(--ink); font: var(--text-13); white-space: pre-wrap; overflow-wrap: anywhere; }
+.comment-card.pass-note:not(.active) .pass-note-text { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 4; overflow: hidden; }
+
+/* History: what an agent changed for each comment. */
+.history-asked, .history-note { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; color: var(--ink); }
+.history-change { display: block; margin-top: var(--space-4); color: var(--ink-soft); font: var(--text-12); overflow-wrap: anywhere; }
+.history-item .history-change { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; }
+.history-detail .history-change { margin-top: 0; }
+.history-change del { padding: 0 var(--space-4); border-radius: 2px; background: var(--diff-removed-tint); color: var(--diff-removed); text-decoration: line-through; }
+.history-change ins { padding: 0 var(--space-4); border-radius: 2px; background: var(--diff-added); color: var(--ink); text-decoration: none; }
+/* Each place it changed moves to the next line whole, never broken in two ("Ana" on one line, "will bring
+   the slides." on the next); one longer than the row wraps inside itself (roadmap Batch 11, F-31). */
+.history-change-place { display: inline-block; max-width: 100%; vertical-align: top; }
+
+/* History reads as the story (roadmap Batch 4, item 2): each row names the
+   sections its version changed and, for your own, what you changed; several
+   of your versions in a row are one row, which opens to each of them. */
+.history-story { grid-column: 1 / -1; display: flex; flex-direction: column; gap: var(--space-4); min-width: 0; }
+.history-story:empty { display: none; }
+/* Each section a small label, two lines of them at most. */
+/* A row names at most six sections, then says how many more: none is cut off unseen. */
+.history-sections { display: flex; flex-wrap: wrap; gap: var(--space-4); margin: 0; font: var(--text-11); }
+.history-section { max-width: 100%; overflow: hidden; padding: 0 var(--space-4); border-radius: 4px; background: var(--chip); color: var(--ink-soft); text-overflow: ellipsis; white-space: nowrap; }
+.history-section-sep { display: none; }
+.history-sections-more { padding: 0; color: var(--ink-soft); white-space: nowrap; }
+.history-story .history-change { margin-top: 0; }
+.history-members { display: flex; flex-direction: column; gap: var(--space-4); list-style: none; margin: 0; padding: 0 var(--space-8) var(--space-8) var(--space-16); }
+.history-member {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  width: 100%;
+  height: auto;
+  margin: 0;
+  padding: var(--space-4) var(--space-8);
+  border: 1px solid transparent;
+  border-left: 2px solid var(--chrome-line);
+  border-radius: 0 6px 6px 0;
+  background: transparent;
+  color: var(--ink);
+  font: var(--text-12);
+  text-align: left;
+  white-space: normal;
+}
+.history-member:hover:not(:disabled) { border-color: var(--chrome-line); background: var(--chip); }
+.history-member[aria-current="true"] { border-color: var(--accent); border-left-color: var(--accent); background: var(--accent-tint); }
+.history-member-when { color: var(--ink-soft); }
+.history-member .history-change { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; }
+/* Find's matches in the comments' cards (roadmap Batch 4, item 2), marked as in the text. */
+::highlight(find-comment) { background-color: var(--find-tint); color: var(--ink); }
+::highlight(find-comment-current) { background-color: var(--find-current); color: var(--ink); }
+.find-count { white-space: nowrap; }
+
+/* Batch 25: Connect names Claude Desktop first */
+/* With no agent tool on the Mac: Claude Desktop set off like a row of the list, with what to do; the rest under
+   Other tools, in the quieter type of the line it replaces. */
+.agent-none { margin: 0 0 var(--space-16); color: var(--ink-soft); font: var(--text-12); }
+.agent-none[hidden] { display: none; }
+.agent-none p { margin: 0; }
+.agent-none .agent-none-what { margin-bottom: var(--space-12); }
+.agent-first-title { margin: 0; padding-top: var(--space-8); border-top: 1px solid var(--divider); color: var(--ink); font: 600 var(--text-13); }
+.agent-first-what { padding: var(--space-4) 0 var(--space-8); border-bottom: 1px solid var(--divider); }
+.agent-others-title { margin: var(--space-12) 0 var(--space-4); color: var(--ink); font: 600 var(--text-12); }
+.agent-none .agent-none-then { margin-top: var(--space-12); }

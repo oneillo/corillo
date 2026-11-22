@@ -1,0 +1,14 @@
+.DS_Store
+/node_modules
+*.log
+.env
+.env.*
+/dist
+test-results/
+playwright-report/
+.claude/worktrees/
+/vendor
+release/
+bench-results/
+screens/
+/downloads/

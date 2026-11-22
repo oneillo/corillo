@@ -1,0 +1,50 @@
+/* Corillo's formatted view on paper, for PDF export. Builds on style.css:
+   always the light look (the page's on-paper class keeps style.css's dark
+   colours away), no window around the page, and nothing that's only there
+   to click. The page margins come from the export itself. */
+html:root { color-scheme: light; --ground: #FFFFFF; }
+
+html, body { height: auto; background: #FFFFFF; }
+body { display: block; }
+
+.page { max-width: none; min-height: 0; margin: 0; padding: 0; background: none; box-shadow: none; }
+.ProseMirror { font-size: 11pt; line-height: 1.5; }
+.ProseMirror pre { font-size: 9pt; }
+
+/* Nothing to click on paper. */
+.ProseMirror .diagram-toggle,
+.ProseMirror .diagram > pre,
+.ProseMirror .diagram-error,
+.ProseMirror .picture.missing,
+.ProseMirror-gapcursor { display: none !important; }
+/* A diagram that can't be drawn shows its code, as it does in Word. */
+.ProseMirror .diagram.has-error > pre { display: block !important; }
+.ProseMirror .diagram-picture { padding: 6pt 0; }
+
+/* A block of HTML shows its words and formatting, as in Word (export-page.ts). */
+.ProseMirror .html-block { white-space: normal; }
+
+/* Gridlines between table cells only help editing. */
+.ProseMirror :is(th, td) + :is(th, td) { border-left: none; }
+
+/* Markdown shown as source in the editor: on paper, just its text. Document details stay out. */
+.ProseMirror pre.raw-block { border: none; background: none; padding: 0; }
+.ProseMirror pre.raw-block::before { display: none; }
+.ProseMirror pre.raw-block[data-kind="front-matter"] { display: none; }
+/* (So the page starts with the text after it, as Word does.) */
+.ProseMirror > pre.raw-block[data-kind="front-matter"] + * { margin-top: 0; }
+
+/* Headings' colour helps reading in the app; on paper, as in Word, they're plain (Orlando). */
+.ProseMirror h1, .ProseMirror h2, .ProseMirror h3, .ProseMirror h4, .ProseMirror h5, .ProseMirror h6 { color: var(--ink); }
+
+/* Keep headings with what follows, and pictures, diagrams and table rows whole.
+   Quotes, callouts and code follow on from the text before them, as in Word,
+   rather than leaving a gap; a page break leaves at least two lines each side. */
+.ProseMirror h1, .ProseMirror h2, .ProseMirror h3, .ProseMirror h4, .ProseMirror h5, .ProseMirror h6 { break-after: avoid; }
+.ProseMirror .picture, .ProseMirror .diagram, .ProseMirror tr { break-inside: avoid; }
+
+/* A table stays on the paper. Its words stay whole wherever they fit; in a
+   table too wide for the paper, the columns whose long words (addresses, say)
+   can't fit break them anywhere rather than run off its edge (export-page.ts). */
+.ProseMirror table { max-width: 100%; }
+.ProseMirror :is(th, td).break-anywhere { overflow-wrap: anywhere; }

@@ -1,0 +1,379 @@
+{
+  "versions": [
+    {
+      "n": 1,
+      "kind": "first",
+      "created": "2026-11-09T09:02:00.000Z",
+      "saved": "2026-11-09T09:02:00.000Z"
+    },
+    {
+      "n": 2,
+      "kind": "person",
+      "created": "2026-11-09T09:03:00.000Z",
+      "saved": "2026-11-09T09:03:00.000Z"
+    },
+    {
+      "n": 3,
+      "kind": "agent",
+      "agent": "Claude",
+      "created": "2026-11-09T09:04:00.000Z",
+      "saved": "2026-11-09T09:04:00.000Z",
+      "addressed": [
+        {
+          "id": "23200267-6907-482f-93ad-1cd976c58ce9",
+          "anchor": {
+            "quote": "We answer people slowly.",
+            "prefix": "# Plan\n\n",
+            "suffix": " Often days later.\n\nThe budget i",
+            "offset": 8
+          },
+          "to": null,
+          "status": "open",
+          "messages": [
+            {
+              "id": "d2c9bd6e-8677-47be-8f26-38a1691a3dd7",
+              "author": {
+                "kind": "person"
+              },
+              "body": "Say how slowly. Use the number from the survey.",
+              "created": "2026-11-10T00:59:51.207Z"
+            },
+            {
+              "id": "836d9a8d-7fbf-4585-8c52-5aae7e14dc89",
+              "author": {
+                "kind": "agent",
+                "name": "Claude"
+              },
+              "body": "Changed it to four days, the survey's average.",
+              "created": "2026-11-10T00:59:51.222Z"
+            }
+          ],
+          "change": {
+            "round": 1,
+            "agent": "Claude",
+            "at": "2026-11-09T09:05:00.000Z",
+            "spans": [
+              {
+                "anchor": {
+                  "quote": "in four days on average",
+                  "prefix": "# Plan\n\nWe answer people ",
+                  "suffix": ". Often days later.\n\nThe budget ",
+                  "offset": 25
+                },
+                "removed": "slowly"
+              }
+            ]
+          }
+        },
+        {
+          "id": "c90200a2-407e-4bce-b3b5-50e5376b9d0b",
+          "anchor": null,
+          "to": null,
+          "status": "open",
+          "messages": [
+            {
+              "id": "694c1f0b-a486-44be-96a7-1038e6a6400e",
+              "author": {
+                "kind": "person"
+              },
+              "body": "Is this the whole document's tone we want?\nKeep it short.",
+              "created": "2026-11-10T00:59:51.207Z"
+            },
+            {
+              "id": "b25129ee-8630-4b38-b400-050e286483e9",
+              "author": {
+                "kind": "agent",
+                "name": "Claude"
+              },
+              "body": "Yes: plain and short. I kept the rest as it was.",
+              "created": "2026-11-10T00:59:51.222Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "n": 4,
+      "kind": "agent",
+      "agent": "Writer",
+      "created": "2026-11-09T09:06:00.000Z",
+      "saved": "2026-11-09T09:06:00.000Z",
+      "addressed": [
+        {
+          "id": "23200267-6907-482f-93ad-1cd976c58ce9",
+          "anchor": {
+            "quote": "We answer people slowly.",
+            "prefix": "# Plan\n\n",
+            "suffix": " Often days later.\n\nThe budget i",
+            "offset": 8
+          },
+          "to": "Writer",
+          "status": "open",
+          "messages": [
+            {
+              "id": "d2c9bd6e-8677-47be-8f26-38a1691a3dd7",
+              "author": {
+                "kind": "person"
+              },
+              "body": "Say how slowly. Use the number from the survey.",
+              "created": "2026-11-10T00:59:51.207Z"
+            },
+            {
+              "id": "836d9a8d-7fbf-4585-8c52-5aae7e14dc89",
+              "author": {
+                "kind": "agent",
+                "name": "Claude"
+              },
+              "body": "Changed it to four days, the survey's average.",
+              "created": "2026-11-10T00:59:51.222Z"
+            },
+            {
+              "id": "9ada3b41-d189-4dff-b3da-0ddae8b1fd17",
+              "author": {
+                "kind": "person"
+              },
+              "body": "@Writer can you make it warmer?",
+              "created": "2026-11-10T00:59:51.227Z",
+              "mention": "Writer"
+            },
+            {
+              "id": "812702b0-5208-4daf-905f-fb627144ee83",
+              "author": {
+                "kind": "agent",
+                "name": "Writer"
+              },
+              "body": "Warmer now: I kept the number and softened the sentence after it.",
+              "created": "2026-11-10T00:59:51.235Z"
+            }
+          ],
+          "change": {
+            "round": 1,
+            "agent": "Claude",
+            "at": "2026-11-09T09:05:00.000Z",
+            "spans": [
+              {
+                "anchor": {
+                  "quote": "in four days on average",
+                  "prefix": "# Plan\n\nWe answer people ",
+                  "suffix": ". Often days later.\n\nThe budget ",
+                  "offset": 25
+                },
+                "removed": "slowly"
+              }
+            ]
+          }
+        }
+      ],
+      "other": [
+        {
+          "anchor": {
+            "quote": "modest",
+            "prefix": "ften days later.\n\nThe budget is ",
+            "suffix": ".\n",
+            "offset": 83
+          },
+          "removed": "small"
+        }
+      ],
+      "request": "Make the budget line sound less apologetic."
+    },
+    {
+      "n": 5,
+      "kind": "agent",
+      "agent": "Claude",
+      "addressed": [
+        {
+          "id": "23200267-6907-482f-93ad-1cd976c58ce9",
+          "anchor": {
+            "quote": "We answer people slowly.",
+            "prefix": "# Plan\n\n",
+            "suffix": " Often days later.\n\nThe budget i",
+            "offset": 8
+          },
+          "to": "Writer",
+          "status": "open",
+          "messages": [
+            {
+              "id": "d2c9bd6e-8677-47be-8f26-38a1691a3dd7",
+              "author": {
+                "kind": "person"
+              },
+              "body": "Say how slowly. Use the number from the survey.",
+              "created": "2026-11-10T00:59:51.207Z"
+            },
+            {
+              "id": "836d9a8d-7fbf-4585-8c52-5aae7e14dc89",
+              "author": {
+                "kind": "agent",
+                "name": "Claude"
+              },
+              "body": "Changed it to four days, the survey's average.",
+              "created": "2026-11-10T00:59:51.222Z"
+            },
+            {
+              "id": "9ada3b41-d189-4dff-b3da-0ddae8b1fd17",
+              "author": {
+                "kind": "person"
+              },
+              "body": "@Writer can you make it warmer?",
+              "created": "2026-11-10T00:59:51.227Z",
+              "mention": "Writer"
+            },
+            {
+              "id": "812702b0-5208-4daf-905f-fb627144ee83",
+              "author": {
+                "kind": "agent",
+                "name": "Writer"
+              },
+              "body": "Warmer now: I kept the number and softened the sentence after it.",
+              "created": "2026-11-10T00:59:51.235Z"
+            },
+            {
+              "id": "d1ae2206-6069-4de2-ba3d-142c0764a2d2",
+              "author": {
+                "kind": "agent",
+                "name": "Claude"
+              },
+              "body": "Nothing more to change here.",
+              "created": "2026-11-10T00:59:51.240Z"
+            }
+          ],
+          "change": {
+            "round": 1,
+            "agent": "Claude",
+            "at": "2026-11-09T09:05:00.000Z",
+            "spans": [
+              {
+                "anchor": {
+                  "quote": "in four days on average",
+                  "prefix": "# Plan\n\nWe answer people ",
+                  "suffix": ". Often days later.\n\nThe budget ",
+                  "offset": 25
+                },
+                "removed": "slowly"
+              }
+            ]
+          }
+        }
+      ],
+      "created": "2026-11-09T09:07:00.000Z",
+      "saved": "2026-11-09T09:07:00.000Z"
+    },
+    {
+      "n": 6,
+      "kind": "person",
+      "open": true,
+      "created": "2026-11-09T09:08:00.000Z",
+      "saved": "2026-11-09T09:08:00.000Z"
+    }
+  ],
+  "texts": {
+    "1": "# Plan\n\nWe answer people slowly.\n\nThe budget is small.\n",
+    "2": "# Plan\n\nWe answer people slowly. Often days later.\n\nThe budget is small.\n",
+    "3": "# Plan\n\nWe answer people in four days on average. Often days later.\n\nThe budget is small.\n",
+    "4": "# Plan\n\nWe answer people in four days on average. Often days later.\n\nThe budget is modest.\n",
+    "5": "# Plan\n\nWe answer people in four days on average. Often days later.\n\nThe budget is modest.\n",
+    "6": "# Plan\n\nWe answer people in four days on average.\n\nThe budget is modest.\n"
+  },
+  "threads": [
+    {
+      "id": "23200267-6907-482f-93ad-1cd976c58ce9",
+      "anchor": {
+        "quote": "We answer people slowly.",
+        "prefix": "# Plan\n\n",
+        "suffix": " Often days later.\n\nThe budget i",
+        "offset": 8
+      },
+      "to": "Writer",
+      "status": "open",
+      "messages": [
+        {
+          "id": "d2c9bd6e-8677-47be-8f26-38a1691a3dd7",
+          "author": {
+            "kind": "person"
+          },
+          "body": "Say how slowly. Use the number from the survey.",
+          "created": "2026-11-10T00:59:51.207Z"
+        },
+        {
+          "id": "836d9a8d-7fbf-4585-8c52-5aae7e14dc89",
+          "author": {
+            "kind": "agent",
+            "name": "Claude"
+          },
+          "body": "Changed it to four days, the survey's average.",
+          "created": "2026-11-10T00:59:51.222Z"
+        },
+        {
+          "id": "9ada3b41-d189-4dff-b3da-0ddae8b1fd17",
+          "author": {
+            "kind": "person"
+          },
+          "body": "@Writer can you make it warmer?",
+          "created": "2026-11-10T00:59:51.227Z",
+          "mention": "Writer"
+        },
+        {
+          "id": "812702b0-5208-4daf-905f-fb627144ee83",
+          "author": {
+            "kind": "agent",
+            "name": "Writer"
+          },
+          "body": "Warmer now: I kept the number and softened the sentence after it.",
+          "created": "2026-11-10T00:59:51.235Z"
+        },
+        {
+          "id": "d1ae2206-6069-4de2-ba3d-142c0764a2d2",
+          "author": {
+            "kind": "agent",
+            "name": "Claude"
+          },
+          "body": "Nothing more to change here.",
+          "created": "2026-11-10T00:59:51.240Z"
+        }
+      ],
+      "change": {
+        "round": 1,
+        "agent": "Claude",
+        "at": "2026-11-09T09:05:00.000Z",
+        "spans": [
+          {
+            "anchor": {
+              "quote": "in four days on average",
+              "prefix": "# Plan\n\nWe answer people ",
+              "suffix": ". Often days later.\n\nThe budget ",
+              "offset": 25
+            },
+            "removed": "slowly"
+          }
+        ]
+      }
+    },
+    {
+      "id": "c90200a2-407e-4bce-b3b5-50e5376b9d0b",
+      "anchor": null,
+      "to": null,
+      "status": "resolved",
+      "messages": [
+        {
+          "id": "694c1f0b-a486-44be-96a7-1038e6a6400e",
+          "author": {
+            "kind": "person"
+          },
+          "body": "Is this the whole document's tone we want?\nKeep it short.",
+          "created": "2026-11-10T00:59:51.207Z"
+        },
+        {
+          "id": "b25129ee-8630-4b38-b400-050e286483e9",
+          "author": {
+            "kind": "agent",
+            "name": "Claude"
+          },
+          "body": "Yes: plain and short. I kept the rest as it was.",
+          "created": "2026-11-10T00:59:51.222Z"
+        }
+      ],
+      "resolved": "2026-11-10T00:59:51.226Z"
+    }
+  ]
+}
