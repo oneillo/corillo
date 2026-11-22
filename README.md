@@ -32,7 +32,7 @@ Your documents are ordinary Markdown files (plain text with a little formatting)
 - A Mac with Apple silicon or an Intel processor, on macOS 13 Ventura or later.
 - For Word: opening Word documents and exporting to Word need macOS 15 Sequoia or later. Everything else, PDF export included, works from macOS 13.
 - An AI agent on your Mac, such as the Claude app for Mac (Claude Desktop) or Claude Code. Claude in a web browser can't reach apps on your Mac.
-- Corillo connects with one click to Claude Code, Claude Desktop, Codex (also Codex in the ChatGPT app), Cursor, VS Code (for GitHub Copilot), Gemini CLI and GitHub Copilot CLI. Of these, only Claude Code and Claude Desktop have been tried in real use so far.
+- Corillo connects with one click to Claude Code, Claude Desktop, Codex (also Codex in the ChatGPT app), Cursor, VS Code (for GitHub Copilot), Gemini CLI and GitHub Copilot CLI. Of these, only Claude Code and Claude Desktop have been tried in real use so far. Kiro CLI works too, connected by hand: it takes the same settings as Claude Desktop, in `~/.kiro/settings/mcp.json` (Help > Corillo Help > Connecting an agent by hand shows them).
 
 ## Install
 
@@ -106,7 +106,7 @@ What works:
 What doesn't, or hasn't been tried:
 
 - **Mac only.** There's no Windows, Linux, iPhone or web version.
-- **Only Claude Code and the Claude app have been tried in real use.** The other tools listed under What it needs connect the same way, but haven't been used day to day yet.
+- **Only Claude Code, the Claude app and Kiro CLI have been tried in real use.** The other tools listed under What it needs connect the same way, but haven't been used day to day yet.
 - **Just you and your agents.** Comments stay on your Mac. Corillo isn't for writing a document with other people.
 - **Not signed by Apple,** so the first open needs the steps above.
 
@@ -135,6 +135,7 @@ Delete the entry named `corillo` from each tool's settings file (Help > Corillo 
 - VS Code: `~/Library/Application Support/Code/User/mcp.json`
 - Gemini CLI: `~/.gemini/settings.json`
 - GitHub Copilot CLI: `~/.copilot/mcp-config.json`
+- Kiro CLI, if you connected it by hand: `~/.kiro/settings/mcp.json`
 
 Beside a file Corillo changed is a copy of how it was before, ending in `.before-corillo`. You can delete it. Don't put it back in place of the settings file: it doesn't have any change the tool made since. Corillo's log, if it wrote one, is in `~/Library/Logs/Corillo`.
 

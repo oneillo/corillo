@@ -79,7 +79,7 @@
   <p>Once an agent has worked on a document, the bar also says whose turn it is, beside Saved: "With you" when the document is yours to edit, or "Claude is editing" (with a dot in the agent's colour) while an agent has it. On a document no agent has touched, it says nothing. After an agent's turn it also counts the comments with something new for you, for example "With you · 4 to read", until you've looked at each one. While an agent is waiting for your review, it says so: "Claude is waiting for your review".</p>
 
   <h2 id="start-connect">Bring in your agents</h2>
-  <p>Connect the agent tools you use once, and they can open your documents in Corillo and work on them with you. Corillo offers this the first time it opens, in a box called Connect your agents. To come back to it later, click Connect your agents on the start screen, or choose Help &gt; Connect Agents… It connects Claude Code, Claude Desktop, Codex, Cursor, VS Code, Gemini CLI and GitHub Copilot CLI with one click. Of these, only Claude Code has been tried in real use so far.</p>
+  <p>Connect the agent tools you use once, and they can open your documents in Corillo and work on them with you. Corillo offers this the first time it opens, in a box called Connect your agents. To come back to it later, click Connect your agents on the start screen, or choose Help &gt; Connect Agents… It connects Claude Code, Claude Desktop, Codex, Cursor, VS Code, Gemini CLI and GitHub Copilot CLI with one click. Of these, only Claude Code and Claude Desktop have been tried in real use so far. Kiro CLI works too, connected by hand: see <a href="#manual-kiro">Kiro CLI</a>.</p>
   <p>An agent tool is the app where you chat with an AI agent. If none is on your Mac yet, the box says so and names Claude Desktop first, the Claude app for Mac: install it and sign in. The others it works with are under Other tools. Once one is installed, come back to Connect your agents to connect it.</p>
   <figure class="help-figure"><img src="help-images/connect.png" width="480" height="375" alt="The Connect your agents screen, listing Claude Code and Claude Desktop, each with a Connect button."></figure>
   <p>Click Connect beside each tool you use. The tool then says Ready, and what to do so it sees Corillo: quit it completely (Command-Q, not just closing its window) and open it again, or start a new session. Under that is a first request to try, with a button to copy it: paste it in a new chat. The moment the tool's agent reaches Corillo, the screen says Connected. If nothing has reached Corillo two minutes later, it says what else to try.</p>
@@ -661,6 +661,8 @@ Prices in \*estimated\* dollars.</pre>
     <li>Save the file, then restart the tool.</li>
   </ol>
   <div id="manual-tools" class="manual-tools"></div>
+  <h2 id="manual-kiro">Kiro CLI</h2>
+  <p>Kiro CLI uses the same settings as Claude Desktop, in a file of its own. Click <strong>Copy</strong> beside Claude Desktop's settings above, then follow the steps with Kiro CLI's file instead: <code>~/.kiro/settings/mcp.json</code>. Then quit Kiro CLI and start it again. It has been tried in real use.</p>
   <h2 id="manual-other">Another agent tool</h2>
   <p>Most agent tools can add an MCP server: the standard way agents connect to apps like Corillo. Look for that in the tool's settings, and give it these details:</p>
   <div id="other-box" class="snippet">

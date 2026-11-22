@@ -100,6 +100,19 @@ describe("Help", () => {
     expect(section("agents-review")).toContain("such as a change it suggests beyond what you asked");
   });
 
+  it("and the README say Kiro CLI works by hand, with Claude Desktop's settings in its own file (2026-11-22)", () => {
+    const kiro = "~/.kiro/settings/mcp.json";
+    const page = html.split('<h2 id="manual-kiro">')[1]?.split("</p>")[0] ?? "";
+    expect(page).toContain("same settings as Claude Desktop");
+    expect(page).toContain(kiro);
+    expect(html).toContain('<a href="#manual-kiro">Kiro CLI</a>');
+    const readme = read("README.md");
+    const toolsLine = readme.split("\n").find((l) => /connects with one click/.test(l))!;
+    expect(toolsLine).toContain("Kiro CLI");
+    expect(toolsLine).toContain(kiro);
+    expect(readme.split("## Uninstall")[1]).toContain(`Kiro CLI, if you connected it by hand: \`${kiro}\``);
+  });
+
   it("and the README hand a document back with Send to Claude, or in the chat where no agent waits", () => {
     const handBack = read("README.md").split("\n").find((line) => line.startsWith("**Handing a document back.**"))!;
     expect(handBack).toContain("Send to Claude");
