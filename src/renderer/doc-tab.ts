@@ -37,7 +37,7 @@ import { commentRanges, withRanges, DRAFT } from "./comments";
 import { changeMarks, withChanges } from "./change-marks";
 import { footnotePlugin } from "./footnotes";
 import { EmbeddedPictures, lookForEmbedsAgain, obsidianPlugin } from "./obsidian";
-import { lineBreaksPlugin } from "./line-breaks";
+import { deleteLineBreakBackward, deleteLineBreakForward, leftOverLineBreak, lineBreaksPlugin } from "./line-breaks";
 import { ImageView, lookAtPicturesAgain, picturePlugin, picturesWaitingChanged, movedAddress, waitingPictureKeys, type PictureStore } from "./images";
 import { DiagramView, isDiagram, diagramCursorPlugin, diagramsWaitingChanged } from "./diagrams";
 import { everydayPlugins } from "./everyday";
@@ -464,8 +464,10 @@ export class DocTab {
         // indented), so typing carries on here.
         Tab: chainCommands(sinkListItem(n.list_item), cmd.indentCode, () => true),
         "Shift-Tab": chainCommands(liftListItem(n.list_item), cmd.outdentCode, () => true),
-        Backspace: chainCommands(undoInputRule, joinOverBlankLine),
-        Delete: joinOverBlankLineForward,
+        Backspace: chainCommands(undoInputRule, joinOverBlankLine, deleteLineBreakBackward),
+        Delete: chainCommands(joinOverBlankLineForward, deleteLineBreakForward),
+        ArrowLeft: leftOverLineBreak(false),
+        "Shift-ArrowLeft": leftOverLineBreak(true),
       }),
       keymap(baseKeymap),
       markdownShortcuts(),

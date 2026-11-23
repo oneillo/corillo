@@ -1,7 +1,7 @@
 {
   "name": "corillo",
   "productName": "Corillo",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A Mac app for writing Markdown documents together with your AI agents, the way you'd work with colleagues.",
   "license": "MIT",
   "private": true,

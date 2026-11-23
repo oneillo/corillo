@@ -41,7 +41,7 @@ The [Releases page](https://github.com/oneillo/corillo/releases) has two downloa
 - If it shows **Chip**, your Mac has Apple silicon. Download `Corillo-<version>-arm64.dmg`.
 - If it shows **Processor**, your Mac has an Intel processor. Download `Corillo-<version>-x64.dmg`.
 
-`<version>` is Corillo's version number, such as 0.1.0. Then:
+`<version>` is Corillo's version number, such as 0.1.1. Then:
 
 1. Open the file you downloaded: double-click it in your Downloads folder. A window opens.
 2. Drag Corillo onto the Applications folder in that window.
@@ -94,7 +94,7 @@ Ideas and fixes are welcome, as an issue or a pull request ([CONTRIBUTING.md](CO
 
 ## What works, and what doesn't yet
 
-This is the first public version, 0.1.0.
+This is the second public version, 0.1.1.
 
 What works:
 
